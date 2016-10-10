@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    var request = require('request');
+  </script>
+  <meta charset="UTF-8">
+<style>
+  body, html {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family: "Nanum Gothic", "Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  .container {
+    width: 100%;
+    height: 100%;
+  }
+  .header {
+    display: flex;
+    flex-direction: row;
+    -webkit-box-align: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 10px;
+    height: 50px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    -webkit-user-select: none;
+  }
+  .logo {
+    height: 30px;
+  }
+  .contents {
+    padding: 10px;
+    margin: 10px;
+  }
+  .item-group {
+    overflow: auto;
+    padding-bottom: 10px;
+  }
+  .label-item {
+    margin: 0 0 7px;
+    padding: 0 0 4px;
+    border-bottom: 1px #aaa solid;
+    font-weight: 700;
+    -webkit-user-select: none;
+  }
+  .select-item {
+    --select-width: 200px;
+    --select-s-width: calc(var(--select-width) - 28px);
+  }
+  .item-group textarea {
+    width: calc(100% - 9px);
+    height: 75px;
+    font-family: Consolas,Monaco,'Andale Mono',monospace;
+    font-size: .8em;
+    direction: ltr;
+    overflow-x: none;
+    overflow-y: auto;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    resize: none;
+  }
+/* -------------------- Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
+/* -------------------- Source: http://bavotasan.com/2011/style-select-box-using-only-css/ */
+  .styled-select {
+    background: url(./images/select_btn.png) no-repeat 96% 0;
+    height: 29px;
+    overflow: hidden;
+    width: var(--select-s-width);
+    float: left;
+  }
+  .styled-select select {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    height: 29px;
+    padding: 5px;
+    width: var(--select-width);
+  }
+  .styled-select.slate select {
+    border: 1px solid #ccc;
+    font-size: 16px;
+    height: 34px;
+    width: var(--select-width);
+  }
+  .rounded {
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+  }
+  .semi-square {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+  .black {
+    background-color: #000;
+  }
+  .black select {
+    color: #fff;
+  }
+  input[type=text], textarea {
+    -webkit-transition: all 0.30s ease-in-out;
+    -moz-transition: all 0.30s ease-in-out;
+    -ms-transition: all 0.30s ease-in-out;
+    -o-transition: all 0.30s ease-in-out;
+    outline: none;
+    padding: 3px 0px 3px 3px;
+    margin: 5px 1px 3px 0px;
+    border: 1px solid #DDDDDD;
+  }
+  
+  input[type=text]:focus, textarea:focus {
+    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+    padding: 3px 0px 3px 3px;
+    margin: 5px 1px 3px 0px;
+    border: 1px solid rgba(81, 203, 238, 1);
+  }
+  .button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    float:right;
+    outline: none;
+  }
+  .button:hover {
+    background-color: #6bc76e;
+    box-shadow: none;
+  }
+  .button:active {
+    background-color: #188a1c;
+  }
+
+  /* Modern Google Loader in Pure CSS */
+/* https://gist.github.com/CodeMyUI/3c3a57a17cb56828356a */
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
+.loader {
+  position: relative;
+  margin: 0px auto;
+  width: 100px;
+  height: 100px;
+  zoom: 1;
+}
+
+.overlay {
+  -webkit-filter: opacity(20%);
+  pointer-events: none;
+}
+
+.circular {
+  animation: rotate 2s linear infinite;
+  height: 100px;
+  position: relative;
+  width: 100px;
+}
+
+.path {
+  stroke-dasharray: 1,200;
+  stroke-dashoffset: 0;
+  animation:
+    dash 1.5s ease-in-out infinite,
+    color 6s ease-in-out infinite;
+  stroke-linecap: round;
+}
+
+#loader_text {
+  width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1,200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -124;
+  }
+}
+
+@keyframes color{
+  100%, 0% {
+    stroke: #d62d20;
+  }
+
+  40% {
+    stroke: #0057e7;
+  }
+
+  66% {
+    stroke: #008744;
+  }
+
+  80%, 90% {
+    stroke: #ffa700;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div id="showbox" class="showbox centered">
+      <div id="loader" class="loader">
+        <svg class="circular" viewBox="25 25 50 50">
+          <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+        </svg>
+      </div>
+      <div id="loader_text"></div>
+    </div>
+    <div id="wrapper">
+      <header class="header">
+        <a href=./main.html><img src="./images/logo.png" class="logo"></a>
+      </header>
+      <div class="contents">
+        <div class="item-group">
+          <div class="label-item">
+            <span class="label">Environment</span>
+          </div>
+          <div class="select-item">
+            <div class="styled-select black rounded">
+              <select name='fruits'>
+                <option value=''>-- 선택 --</option>
+                <option value='flume'>Flume</option>
+                <option value='kafka'>Kafka</option>
+                <option value='hive' selected>Hive</option>
+                <option value='Logstash'>Logstash</option>
+                <option value='fluentd'>fluentd</option>
+                <option value='httpd'>httpd</option>
+              </select>
+            </div>
+          </div>
+          <button id="test_btn" class="button">Test</button>
+        </div>
+        <div class="item-group">
+          <div class="label-item">
+            <span class="label">Regular Expression</span>
+          </div>
+          <div class="textarea">
+            <textarea id="config_textarea"></textarea>
+          </div>
+        </div>
+        <div class="item-group">
+          <div class="label-item">
+            <span class="label">Test Set</span>
+          </div>
+          <div class="textarea">
+            <textarea id="testset_textarea"></textarea>
+          </div>
+        </div>
+        <div class="item-group">
+          <div class="label-item">
+            <span class="label">Result</span>
+          </div>
+          <div class="textarea">
+            <textarea id="output_textarea"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    test_btn.addEventListener("click", () => {
+      var success = false;
+      showbox.hidden = false;
+      wrapper.classList.add('overlay');
+      output_textarea.value = '';
+      loader_text.innerText = '';
+      var lastmsg = '';
+      const spawn = require('child_process').spawn;
+      const regex = config_textarea.value;
+      const testset = testset_textarea.value;
+
+      //const ls = spawn('docker', ['run', '--rm', '-i', 'ubuntu:16.04', 'echo',`"##START_RESULT##${regex} ${testset}##END_RESULT##"`]);
+      const ls = spawn('docker', ['run', '--rm', '-i', 'ubuntu:16.04', 'echo','"##START_RESULT##{"resultType":"GROUP","testResult":{"resultList":[["Hello","Test","String"],null]}}##END_RESULT##"']);
+
+      var parseJSONString = (data) => {
+        if (typeof data === 'string' && data.search('##START_RESULT##') != -1 && data.search('##END_RESULT##') != -1) {
+          console.log(`${data}`);
+          showbox.hidden = true;
+          wrapper.classList.remove('overlay');
+          data = data.substr(data.search('##START_RESULT##') + 16, data.search('##END_RESULT##') - 17);
+          console.log(JSON.parse(data));
+          output_textarea.value = data;
+          success = true;
+        }
+      }
+      const ls = spawn('docker', ['run', '--rm', '-i', 'ubuntu:16.04', 'echo','"##START_RESULT##{"resultType":"GROUP","testResult":{"resultList":[["Hello","Test","String"],null]}}##END_RESULT##"']);
+      ls.stdout.on('data', (data) => {
+        parseJSONString(data.toString());
+      });
+
+      ls.stderr.on('data', (data) => {
+        console.info(`${data}`);
+        var lines = data.toString().split('\n');
+        loader_text.innerText = `${lines[0]}`;
+        parseJSONString(data);
+          //console.log(`stderr: ${data}`);
+        lastmasg = data;
+      });
+
+      ls.on('close', (code) => {
+          if (!success)
+          {
+            alert(`Error Docker Execute : ${lastmsg}`);
+            showbox.hidden = true;
+            wrapper.classList.remove('overlay');
+            loader_text.innerText = '';
+          }
+          console.log(`child process exited with code ${code}`);
+      });
+
+      let receive = `{
+        "_id": "ca3dfe24aaeca03b02f6e99b85a4c20b",
+        "_rev": "1-3c42358f8396767585c0ffc388b2c49b",
+        "type": "share",
+        "title": "Hive Regex SerDe",
+        "description": "Hive Regex SerDe'",
+        "created": 1473592151000,
+        "author": "u.g.3872573",
+        "class": "java",
+        "tags": [
+          "java","hive"
+        ],
+        "properties": [
+          {
+            "name": "input.regex",
+            "value": "(0[0-9]{2})-([0-9]{3,4})-([0-9]{3,4})"
+          },
+          {
+            "name": "column.types",
+            "value": "string,string,string"
+          }, {
+            "name": "columns",
+            "value": "First,Second,Third"
+          }
+        ]
+      }`;
+
+      //alert("asdfasdßßßß");
+    }, false);
+
+    var shareToSomething = () => {
+      request.post('http://service.com/upload', {form:{key:'value'}});
+    };
+
+    config_textarea.value = '{"columns": "A,B,C","columns.types":"string,string,string"}';
+    testset_textarea.value = '{"testStrings":["010-1111-2222","010-3333-4444"]}';
+    showbox.hidden = true;
+  </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+textarea {
+  outline: none;
+}
+
+textarea:active {
+  outline: blue;
+}
+
+#env-info {
+  margin-bottom: 1rem;
+  display:inline-block;
+}
+
+#env-info > span {
+  display: block;
+}
+
+#env-info .title {
+  font-size: 1.5rem;
+  font-weight: 200;
+}
+
+#env-info .details {
+  font-size: 0.75rem;
+}
+
+#test-btn {
+  display: initial;
+}
+
+#test-btn button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  float: right;
+  outline: none;
+}
+#test-btn button:hover {
+  background-color: #6bc76e;
+  box-shadow: none;
+}
+#test-btn button:active {
+  background-color: #188a1c;
+}
+
+#property-list {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#property-list tr:nth-of-type(2n+1) > * {
+  background: #f5f5f5;
+}
+
+#property-list th,
+#property-list td {
+  width: 50%;
+  padding: 0.25rem 1rem;
+  font-weight: 200;
+}
+
+#property-list th {
+	text-align: right;
+  vertical-align: top;
+  border-right: 2px solid #d0d0d0;
+}
+
+#property-list th span:before {
+  content: '';
+  display: inline-block;
+}
+
+#property-list th span.required:before {
+	content: '*';
+  color: red;
+  margin-right: 0.5rem;
+}
+
+#property-list th a.help {
+  display: inline-block;
+  margin-left: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  text-align: center;
+  line-height: 1rem;
+  text-decoration: none;
+  color: white;
+  background-color: deepskyblue;
+  border-radius: 100px;
+}
+
+#property-list td span.example {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+#property-list textarea {
+  width: 100%;
+  resize: none;
+}
+
+#label-item {
+  margin: 20px 0 7px;
+  padding: 0 0 4px;
+  border-bottom: 1px #aaa solid;
+  font-weight: 200;
+  -webkit-user-select: none;
+}
+
+#test-set, #result-set {
+  margin: 2px 8px 1px 1px;
+}
+
+#test-set textarea, #result-set textarea {
+  width: 100%;
+  height: 120px;
+  resize: none;
+  font-size: .8em;
+}

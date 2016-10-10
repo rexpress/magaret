@@ -1,0 +1,12 @@
+{
+  "name": "magaret",
+  "version": "0.0.1",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "electron ./src/app.js"
+  },
+  "dependencies": {
+    "electron": "^1.4.2",
+    "request": "^2.75.0"
+  }
+}
