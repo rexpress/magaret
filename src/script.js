@@ -28,11 +28,18 @@ var resize = (function (text) {
   resize();
 });
 
+function escapeShellArg (cmd) {
+    return '\'' + cmd.replace(/\'/g, "'\\''") + '\'';
+}
+
 var docker_exec = (run, param, stdout, stderr, end) => {
   "use strict";
   
   const spawn = require('child_process').spawn;
-  const ls = spawn(run, param);
+  const ls = spawn(run, param, {
+    detached: true,
+    windowsVerbatimArguments: true
+  });
   ls.stdout.on('data', stdout);
   ls.stderr.on('data', stderr);
   ls.on('close', end);
@@ -104,6 +111,9 @@ var reqEnvPath = (w, d, j) => {
 
         }
       }
+
+      if (!list.length) continue;
+
       var nav = d.getElementById('sidebar-navi');
       var item = d.createElement('a');
       item.href = "javascript:void(0);";
@@ -151,23 +161,43 @@ var reqEnvPath = (w, d, j) => {
     if (e.target.tagName == 'INPUT' || e.target.tagName == 'TEXTAREA') return true;
     var select = d.querySelector('.item-select');
     var focus = d.querySelector('.item-focus');
-    console.log(focus);
     var prev = (typeof focus !== 'undefined' ? focus.previousElementSibling : '');
     var next = (typeof focus !== 'undefined' ? focus.nextElementSibling : '');
     while(1) {
-      if (prev != null && prev.tagName != 'A' && prev.previousElementSibling != null) {
-          prev = prev.children[0];
-          if (prev.tagName == 'A') break;
-      }
-      else if (prev.parentElement.classList.contains('sub-list')) {
-          prev = parentElement.previousElementSibling;
+      if (prev != null && prev.tagName != 'A') {
+        if (prev.classList.contains('sub-list')) {
+          console.log('asdfasdf');
+          prev = prev.children[prev.childElementCount-1];
+          break;
         }
+        prev = prev.previousElementSibling;
+        if (typeof prev != 'undefined' && prev.tagName == 'A') break;
+        console.info(prev);
+        
+      }
+      else if (prev == null && focus.parentElement.classList.contains('sub-list')) {
+        prev = focus.parentElement.previousElementSibling;
+        console.info(prev);
+        if (typeof prev != 'undefined' && prev.tagName == 'A') break;
+      }
+      
         //prev = prev.previousElementSibling;
       else break;
     }
     while(1) {
-      if (next != null && next.tagName != 'A' && next.nextElementSibling != null)
+      if (next != null && next.tagName != 'A') {
+        if (next.classList.contains('sub-list') && next.childElementCount) {
+          next = next.children[0];
+          break;
+        }
+      
         next = next.nextElementSibling;
+        if (typeof next != 'undefined' && next.tagName == 'A') break;
+      }
+      else if (next == null && focus.parentElement.classList.contains('sub-list')) {
+        next = focus.parentElement.nextElementSibling;
+        break;
+      }
       else break;
     }
     switch(e.key) {
@@ -406,8 +436,8 @@ var data_fill = function (w, d, undefined) {
     }
     console.info(property);
 
-    var testObj = {};
-    testObj.testString = document.querySelector('[data-name="test-set"]').value.trim().split('\n');
+    var testObj;
+    testObj = document.querySelector('[data-name="test-set"]').value.trim().split('\n');
     console.info(testObj);
     
     var result_set = document.querySelector('[data-name="result-set"]');
@@ -416,10 +446,13 @@ var data_fill = function (w, d, undefined) {
     var success = false;
     var last_err = '';
     console.log(`${JSON.stringify(property)} ${JSON.stringify(testObj)}`);
-    var property = JSON.stringify(property).replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"");
-    var teststr = JSON.stringify(testObj).replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"");
-    console.info(`"${property} ${teststr}"`);
-    docker_exec('docker', ['run', '--rm', '-i', data.docker_image, `"${property} ${teststr}"`], 
+    var property = JSON.stringify(property);
+    var teststr = JSON.stringify(testObj);
+    var res = property + ' ' + teststr;
+    res = res.split(' ');
+    console.log(res);
+    console.info(`"${property}" "${teststr}"`);
+    docker_exec('docker', ['run', '--rm', '-i', `${data.docker_image}`,`${property}`,`${teststr}`], 
       (data) => {
         var str = data.toString();
         var START_RESULT = '##START_RESULT##';
