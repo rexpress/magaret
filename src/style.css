@@ -58,6 +58,29 @@ textarea:active {
 #test-btn button:active {
   background-color: #009270;
 }
+#test-btn {
+  display: initial;
+}
+
+#share-btn button {
+  background-color: #005eaf;
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  float: left;
+  outline: none;
+}
+#share-btn button:hover {
+  background-color: #037be2;
+  box-shadow: none;
+}
+#share-btn button:active {
+  background-color: #044d8c;
+}
 
 .disable-btn button {
   background: #aaa !important;
@@ -138,6 +161,11 @@ textarea:active {
   height: 120px;
   resize: none;
   font-size: .8em;
+}
+
+#foot-area {
+  margin-top: 20px;
+  margin-bottom: 5px;
 }
 
 a {

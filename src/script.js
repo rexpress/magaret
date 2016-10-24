@@ -1,3 +1,5 @@
+gl = {};
+
 var resize = (function (text) {
   "use strict";
 
@@ -28,13 +30,9 @@ var resize = (function (text) {
   resize();
 });
 
-function escapeShellArg (cmd) {
-    return '\'' + cmd.replace(/\'/g, "'\\''") + '\'';
-}
-
 var docker_exec = (run, param, stdout, stderr, end) => {
   "use strict";
-  
+  console.warn(param);
   const spawn = require('child_process').spawn;
   const ls = spawn(run, param, {
     detached: true,
@@ -60,7 +58,9 @@ var open_env = el => {
   else 
     console.log("open_env: " + el.dataset.envName);
 
-  data_fill(window, document, data);
+  var envName = el.dataset.envName.substr(0, el.dataset.envName.search('.json')).split('/');
+
+  data_fill(window, document, data, envName);
 
 //   const request = require('request');
 //   request.get(`https://github.com/rexpress/environments/raw/master/${el.dataset.envName}`,
@@ -182,6 +182,56 @@ var reqEnvPath = (w, d, j) => {
 }
 
 
+(function (w, d, undefined) {
+  var sh_back = d.getElementById('sh_back');
+  sh_back.addEventListener('click', () => {
+    sh_back.hidden = true;
+    sh_title.value = '';
+    sh_desc.value = '';
+  });
+  sh_div.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  sh_share.addEventListener('click', e => {
+
+    var options = {
+      url: 'https://rexpress.cloudant.com/re',
+      method: 'POST',
+      json: {
+        'type': 'share',
+        'title': sh_title.value,
+        'description': sh_desc.value,
+        'created': Date.now(),
+        'author': 'u.g.22958708',
+        'env': gl.envname,
+        'tags': ['test'],
+        'properties': gl.property,
+        'input': gl.testobj,
+        'output': {
+          'type': gl.resobj.type,
+          'result': gl.resobj.result.resultList
+        }
+      },
+      headers: {
+        'User-Agent': 'regex_agent',
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic YWJpdHlwaWNoZWRkaXNseWRpdHNwYXRlOjYzYjlkNjFlOTY1YmFiNzRhNDBmZTYwODg1YmFmZjllNDk1OWQyMGE='
+      }
+    }
+
+    console.log(options);
+    const request = require('request');
+      request(options, (err, res, body) => {
+        console.log(body);
+
+        alert('Shared!');
+        sh_back.hidden = true;
+        sh_title.value = '';
+        sh_desc.value = '';
+     });
+  })
+}(window, document));
   // const request = require('sync-request');
   // console.log(request);
   // var res = request('GET', 'https://api.github.com/repos/rexpress/environments/git/trees/master?recursive=1');
@@ -385,8 +435,10 @@ var reqEnvPath = (w, d, j) => {
   //reqEnvPath(w, d, api_data);
 }(window, document));
 
-var data_fill = function (w, d, data) {
+var data_fill = function (w, d, data, envName) {
 	"use strict";
+
+  gl.envname = envName;
 
   var container = d.getElementsByClassName('_container')[0];
   container.innerHTML = '';
@@ -458,6 +510,10 @@ var data_fill = function (w, d, data) {
   var w_debug_output = d.createElement('div');
   w_debug_output.id = 'debug-output';
   wrapper.appendChild(w_debug_output);
+
+  var w_foot_area = d.createElement('div');
+  w_foot_area.id = 'foot-area';
+  wrapper.appendChild(w_foot_area);
 
   container.appendChild(wrapper);
 
@@ -570,6 +626,10 @@ var data_fill = function (w, d, data) {
   test_set.appendChild(textarea);
 
   reset_btn.addEventListener('click', () => {
+
+    var tail_area = document.getElementById('foot-area');
+    tail_area.innerText = '';
+
     for (let x of property_list) {
       if (x.type == 'checkbox')
         x.checked = false;
@@ -597,11 +657,11 @@ var data_fill = function (w, d, data) {
     var success = false;
     var last_err = '';
     console.log(`${JSON.stringify(property)} ${JSON.stringify(testObj)}`);
+    gl.property = property;
+    gl.testobj = testObj;
+    
     var property = JSON.stringify(property);
     var teststr = JSON.stringify(testObj);
-    var res = property + ' ' + teststr;
-    res = res.split(' ');
-    console.log(res);
     console.info(`"${property}" "${teststr}"`);
     docker_exec('docker', ['run', '--rm', '-i', `${data.docker_image}`,`${property}`,`${teststr}`], 
       (data) => {
@@ -614,6 +674,7 @@ var data_fill = function (w, d, data) {
 
           var res_obj = JSON.parse(str);
           console.log(str);
+          gl.resobj = res_obj;
 
           switch (res_obj.type) {
             case 'GROUP':
@@ -678,6 +739,20 @@ var data_fill = function (w, d, data) {
 
             break;
           }
+
+
+          var foot_area = d.getElementById('foot-area');
+          var share_btn = d.createElement('button');
+          var btn_el = d.createElement('div');
+          btn_el.id = 'share-btn';
+          share_btn.innerText = "Share";
+          share_btn.addEventListener('click', (e) => {
+            sh_back.hidden = false;
+          });
+          btn_el.appendChild(share_btn);
+          foot_area.appendChild(btn_el);
+
+
           document.getElementById('debug-output').innerText = (typeof res_obj.debugOutput !== 'undefined' ? res_obj.debugOutput : '');
           if (res_obj.exception) {
             last_err = res_obj.exception;
