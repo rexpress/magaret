@@ -6,8 +6,9 @@
     "start": "electron ./src/app.js"
   },
   "dependencies": {
+    "async": "^2.1.2",
     "electron": "^1.4.2",
-    "request": "^2.75.0",
-    "sync-request": "^3.0.1"
+    "jsonfile": "^2.4.0",
+    "request": "^2.75.0"
   }
 }

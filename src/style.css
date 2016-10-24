@@ -264,5 +264,13 @@ html, body {
 }
 
 .sub-list a {
-  padding-left: 30px !important;
+  padding-left: 32px !important;
+}
+
+.parent_item {
+  background: #f1eaa1;
+}
+
+.child_item {
+  background: white;
 }
