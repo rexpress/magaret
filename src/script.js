@@ -608,7 +608,8 @@ var data_fill = function (w, d, data, envName) {
     if (prop.example) {
       var example = d.createElement('span');
       example.className = 'example';
-      example.innerHTML = `example: ${prop.example}`;
+      var ex = prop.example.replace(/\n/g, '<br>');
+      example.innerHTML = `example: ${ex}`;
       td.appendChild(example);
     }
     tr.appendChild(td);
