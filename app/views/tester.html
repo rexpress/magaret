@@ -1,0 +1,33 @@
+<div id="tester-view">
+	<aside>
+		<form class="search" role="search">
+			<input type="search" style="" disabled class="search-input" placeholder="Search…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="30" aria-label="Search">
+			<div class="search-tag"></div>
+		</form>
+		<nav id="lnb">
+			<ul>
+				<li ng-repeat="envGroup in envInfo">
+					<div class="item parent-item">
+						<span class="icon">
+							<i ng-show="envGroup.info.icon.type == 'devicon'" class="devicon-{{ envGroup.info.icon.value }}-plain"></i>
+							<img ng-show="envGroup.info.icon.type == 'image'" ng-src="{{ envGroup.info.icon.value }}">
+						</span>
+						<span class="title">{{ envGroup.info.title }}</span>
+					</div>
+					<ul class="sub-list">
+						<li ng-repeat="envChild in envGroup.children">
+							<div class="item child-item" ng-click="loadEnv(envChild)">
+								<span class="title">{{ envChild.info.title }}</span>
+							</div>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+	</aside>
+	<section id="main">
+	
+	</section>
+</div>
+
+

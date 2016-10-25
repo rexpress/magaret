@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "src/app.js",
   "scripts": {
-    "start": "electron ./src/app.js"
+    "start": "electron app/app.js"
   },
   "dependencies": {
     "async": "^2.1.2",

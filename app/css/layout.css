@@ -1,0 +1,52 @@
+@charset "utf-8";
+
+header {
+	padding: 10px 15px;
+	background-color: #00af86;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+header #logo {
+	width: 200px;
+	height: 2.5rem;
+	display: inline-block;
+}
+
+header #logo a {
+	width: inherit;
+	height: inherit;
+}
+
+header #logo #logo-content {
+	width: inherit;
+	height: inherit;
+	background-image: url(../images/logo-white.png);
+	background-repeat: no-repeat;
+	background-size: 200px;
+	background-position-y: 3px;
+}
+
+header #gnb {
+	overflow: hidden;
+	height: 32px;
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	font-size: 1.3rem;
+	font-weight: 100;
+	padding: 0px 2px 2px 3px;
+}
+
+header #gnb .nav-item {
+	color: #ffffff;
+	margin-left: 25px;
+}
+
+header #gnb .nav-select {
+	border-bottom: 1px #fff solid;
+}
+
+section#content{
+	height: 100%;
+}

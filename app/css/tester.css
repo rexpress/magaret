@@ -1,0 +1,230 @@
+@charset "utf-8";
+
+#tester-view{
+	height: 100%;
+}
+
+#tester-view aside {
+	width: 300px;
+	height: 100%;
+	background: aliceblue;
+	float: left;
+	height: calc(100% - 66px);
+	overflow: auto;
+}
+
+#tester-view aside > form {
+	padding: 10px;
+}
+
+#tester-view aside > form > input {
+	width: 100%;
+	font-size: 1rem;
+	-webkit-appearance: searchfield;
+	box-sizing: border-box;
+}
+
+
+/* lnb section */
+nav#lnb ul{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+nav#lnb ul li{
+	margin: 0;
+	padding: 0;
+}
+
+
+nav#lnb .item {
+	padding: 8px 0px 8px 10px;
+	display: block;
+	color: black;
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 14px;
+}
+
+
+nav#lnb .item.parent-item { background: #f1eaa1}
+nav#lnb .item.child-item { background: white }
+nav#lnb .item.child-item .title{ padding-left: 32px !important}
+
+
+
+/* Main content (Test Area) */
+
+#tester-view #main {
+	overflow: auto;
+	height: calc(100% - 70px);
+}
+
+#main .container{
+	padding: 15px;
+	height: 100%;
+}
+
+
+
+#main h3 {
+	margin: 20px 0 7px;
+	padding: 0 0 4px;
+	border-bottom: 1px #aaa solid;
+	font-weight: 200;
+	-webkit-user-select: none;
+}
+
+
+
+
+#main section.info {
+	margin-bottom: 1rem;
+	display:inline-block;
+}
+
+#main section.info > span {
+	display: block;
+}
+
+#main section.info h2 {
+	margin: 0;
+	padding: 0;
+	font-size: 1.5rem;
+	font-weight: 200;
+}
+
+#main section.info .details {
+	font-size: 0.75rem;
+}
+
+#main section.buttons {
+	display: initial;
+}
+
+#main section.buttons button {
+	background-color: #00af86; /* Green */
+	border: none;
+	color: white;
+	padding: 8px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	float: right;
+	outline: none;
+}
+#main section.buttons button:hover {
+	background-color: #00ca9b;
+	box-shadow: none;
+}
+#main section.buttons button:active {
+	background-color: #009270;
+}
+
+
+
+#main section#test-set,
+#main section#result-set {
+	margin: 2px 8px 1px 1px;
+}
+
+#main section#test-set textarea,
+#main section#result-set textarea {
+	width: 100%;
+	height: 120px;
+	resize: none;
+	font-size: .8em;
+}
+
+
+#foot-area {
+	margin-top: 20px;
+	margin-bottom: 5px;
+}
+
+
+#main #properties {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+#main #properties tr:nth-of-type(2n+1) > * {
+	background: #f5f5f5;
+}
+
+#main #properties th,
+#main #properties td {
+	width: 50%;
+	padding: 0.25rem 1rem;
+	font-weight: 200;
+}
+
+#main #properties th {
+	text-align: right;
+	vertical-align: top;
+	border-right: 2px solid #d0d0d0;
+}
+
+#main #properties th span:before {
+	content: '';
+	display: inline-block;
+}
+
+#main #properties th span.required:before {
+	content: '*';
+	color: red;
+	margin-right: 0.5rem;
+}
+
+#main #properties th a.help {
+	display: inline-block;
+	margin-left: 0.5rem;
+	width: 1rem;
+	height: 1rem;
+	text-align: center;
+	line-height: 1rem;
+	text-decoration: none;
+	color: white;
+	background-color: deepskyblue;
+	border-radius: 100px;
+}
+
+#main #properties td span.example {
+	display: block;
+	font-size: 0.75rem;
+	opacity: 0.8;
+}
+
+#main #properties textarea {
+	width: 100%;
+	resize: none;
+}
+
+
+
+
+#share-btn button {
+	background-color: #005eaf;
+	border: none;
+	color: white;
+	padding: 8px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	float: left;
+	outline: none;
+}
+#share-btn button:hover {
+	background-color: #037be2;
+	box-shadow: none;
+}
+#share-btn button:active {
+	background-color: #044d8c;
+}
+
+.disable-btn button {
+	background: #aaa !important;
+	pointer-events: none;
+}
