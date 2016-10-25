@@ -19,6 +19,10 @@ app.run(function ($rootScope) {
 	$rootScope.$on('$routeChangeStart', function (event, next) {
 		$rootScope.currentRoute = next;
 	});
+
+	$rootScope.openBrowser = (url) => {
+		require('electron').shell.openExternal(url);
+	};
 });
 
 
@@ -76,13 +80,11 @@ app.controller("TestingPageController", function($scope) {
 		$scope.testSetInput = "";
 		$scope.testResultSet = null;
 		$scope.debugOutput = null;
+		$scope.notice = null;
 	}
 
 
 	$scope.testForm = function() {
-		console.log($scope.propertyInput);
-		console.log($scope.testSetInput);
-
 		var docker_exec = (run, param, stdout, stderr, end) => {
 			const spawn = require('child_process').spawn;
 			const ls = spawn(run, param, {
@@ -99,8 +101,11 @@ app.controller("TestingPageController", function($scope) {
 		const property = JSON.stringify( $scope.propertyInput );
 		const testSet = JSON.stringify( $scope.testSetInput.trim().split('\n') );
 		
+		var testResult;
+
 		docker_exec('docker', ['run', '--rm', '-i', docker_image, property, testSet],
 			(data) => {
+				// on stdout data received
 				var str = data.toString();
 				var START_RESULT = '##START_RESULT##';
 				var END_RESULT = '##END_RESULT##';
@@ -109,26 +114,35 @@ app.controller("TestingPageController", function($scope) {
 					str = str.substr( START_RESULT.length );
 					str = str.substr( 0, str.search(END_RESULT) );
 
-					var result = JSON.parse(str);
+					testResult = JSON.parse(str);
+					console.log(testResult);
 
-					$scope.testResultSet = JSON.stringify(result.result);
-					$scope.debugOutput = result.debugOutput;
+					$scope.testResultSet = JSON.stringify(testResult.result);
+					$scope.debugOutput = testResult.debugOutput;
 					$scope.$apply();
+
 				}
 			},
 			(data) => {
-				console.log('stderr');
-				console.info(data.toString());
+				// on stderr data received
 				$scope.notice = {
 					'color': 'blue',
 					'text': data.toString()
-				}
+				};
 				$scope.$apply();
 
-				// stderror
 		  	},
 			(code) => {
-				// end
+				// on end
+				if (testResult && testResult.exception) {
+					$scope.notice = {
+						'color': 'red',
+						'text': testResult.exception
+					};
+					$scope.$apply();
+
+				}else
+					$scope.notice = null;
 			}
 		);
 	};

@@ -32,7 +32,7 @@
 		<nav id="gnb">
 			<a href="index.html#/" class="nav-item" ng:class="currentRoute.name == 'tester' && 'nav-select'" title="Test Regex">Test Regex</a>
 			<a href="index.html#/history" class="nav-item" ng:class="currentRoute.name == 'history' && 'nav-select'" title="History">History</a>
-			<a href="http://regular.express" class="nav-item" title="WebPage">Official Page</a>
+			<a ng-click="openBrowser('http://regular.express')" class="nav-item" title="WebPage">Official Website</a>
 		</nav>
 	</header>
 
