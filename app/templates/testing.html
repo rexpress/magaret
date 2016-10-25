@@ -1,0 +1,57 @@
+<div ng-show="notice" class="notice {{ notice.color }}">{{ notice.text }}</div>
+
+<div class="container">
+	<div class="header">
+		<section class="info">
+			<h2>{{ selectedEnv.info.title }}</h2>
+			<span class="description">{{ selectedEnv.info.description }}</span>
+			<span class="details">
+				<span>By {{ selectedEnv.info.author }}</span> |
+				<span>Version: {{ selectedEnv.info.version }}</span> |
+				<span>Image: {{ selectedEnv.info.docker_image }}</span>
+			</span>
+		</section>
+		<section class="buttons">
+			<button ng-click="testForm()">Test</button>
+			<button ng-click="resetForm()">Reset</button>
+		</section>
+	</div>
+	<table id="properties">
+		<input type="hidden" value="extractor" data-name="test_type">
+
+		<tr ng-repeat="property in selectedEnv.info.properties" ng-show="property.type != 'hidden'">
+			<th>
+				<span ng:class="property.required && 'required'">{{ property.name }}</span>
+				<a class="help" title="{{ property.help }}">?</a>
+			</th>
+			<td>
+				<div ng-switch on="property.type">
+					<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>
+					<input  ng-switch-when="number"  type="number"   ng-model="propertyInput[property.name]">
+					<input  ng-switch-when="boolean" type="checkbox" ng-model="propertyInput[property.name]"></textarea>
+					<select ng-switch-when="list" ng-model="propertyInput[property.name]" ng-option="property.list"></select>
+				</div>
+
+				<pre ng-show="property.type == 'string' || property.type == 'number'" class="example">example: {{ property.example }}</pre>
+			</td>
+		</tr>
+	</table>
+
+	<h3>Test Set</h3>
+	<section id="test-set">
+		<textarea ng-model="testSetInput"></textarea>
+	</section>
+
+	<h3>Result Set</h3>
+	<section id="result-set">
+		<textarea disabled="disabled" ng-model="testResultSet"></textarea>
+	</section>
+
+	<h3>Debug Output</h3>
+	<section id="debug-output">
+		<textarea disabled="disabled" ng-model="debugOutput"></textarea>
+	</section>
+
+
+	<div id="foot-area"></div>
+</div>

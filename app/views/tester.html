@@ -8,16 +8,16 @@
 			<ul>
 				<li ng-repeat="envGroup in envInfo">
 					<div class="item parent-item">
-						<span class="icon">
-							<i ng-show="envGroup.info.icon.type == 'devicon'" class="devicon-{{ envGroup.info.icon.value }}-plain"></i>
-							<img ng-show="envGroup.info.icon.type == 'image'" ng-src="{{ envGroup.info.icon.value }}">
+						<span class="icon" ng-switch on="envGroup.info.icon.type">
+							<i ng-switch-when="devicon" class="devicon-{{ envGroup.info.icon.value }}-plain"></i>
+							<img ng-switch-when="image" ng-src="{{ envGroup.info.icon.value }}">
 						</span>
-						<span class="title">{{ envGroup.info.title }}</span>
+						<span class="title">{{ envGroup.name }}</span>
 					</div>
 					<ul class="sub-list">
 						<li ng-repeat="envChild in envGroup.children">
-							<div class="item child-item" ng-click="loadEnv(envChild)">
-								<span class="title">{{ envChild.info.title }}</span>
+							<div class="item child-item" ng:class="selectedEnv == envChild && 'selected'" ng-click="loadEnv(envChild)">
+								<span class="title">{{ envChild.name }}</span>
 							</div>
 						</li>
 					</ul>
@@ -26,7 +26,8 @@
 		</nav>
 	</aside>
 	<section id="main">
-	
+		<standby ng-hide="selectedEnv"></standby>
+		<testing-page ng-show="selectedEnv" ng-controller="TestingPageController"></testing-page>
 	</section>
 </div>
 

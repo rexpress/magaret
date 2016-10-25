@@ -1,0 +1,66 @@
+@charset "utf-8";
+
+#tester-view{
+	height: 100%;
+}
+
+#tester-view aside {
+	width: 300px;
+	height: 100%;
+	background: aliceblue;
+	float: left;
+	height: calc(100% - 66px);
+	overflow: auto;
+}
+
+#tester-view aside > form {
+	padding: 10px;
+}
+
+#tester-view aside > form > input {
+	width: 100%;
+	font-size: 1rem;
+	-webkit-appearance: searchfield;
+	box-sizing: border-box;
+}
+
+
+/* lnb section */
+nav#lnb ul{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+nav#lnb ul li{
+	margin: 0;
+	padding: 0;
+}
+
+
+nav#lnb .item {
+	padding: 8px 0px 8px 10px;
+	display: block;
+	color: black;
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 14px;
+}
+
+
+nav#lnb .item.parent-item { background: #f1eaa1}
+nav#lnb .item.child-item { background: white }
+nav#lnb .item.child-item .title{ padding-left: 32px !important}
+
+nav#lnb .item.selected {
+	background: #00af86;
+	color: white !important;
+}
+
+
+
+/* Main content (Test Area) */
+
+#tester-view #main {
+	overflow: auto;
+	height: calc(100% - 70px);
+}

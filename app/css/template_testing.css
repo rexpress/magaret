@@ -1,73 +1,23 @@
 @charset "utf-8";
 
-#tester-view{
-	height: 100%;
+testing-page .notice{
+	display: -webkit-box;
+	padding: 10px 10px 10px 15px;
+	color: white;
 }
 
-#tester-view aside {
-	width: 300px;
-	height: 100%;
-	background: aliceblue;
-	float: left;
-	height: calc(100% - 66px);
-	overflow: auto;
-}
-
-#tester-view aside > form {
-	padding: 10px;
-}
-
-#tester-view aside > form > input {
-	width: 100%;
-	font-size: 1rem;
-	-webkit-appearance: searchfield;
-	box-sizing: border-box;
-}
-
-
-/* lnb section */
-nav#lnb ul{
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-nav#lnb ul li{
-	margin: 0;
-	padding: 0;
-}
-
-
-nav#lnb .item {
-	padding: 8px 0px 8px 10px;
-	display: block;
-	color: black;
-	overflow: hidden;
-	white-space: nowrap;
-	font-size: 14px;
-}
-
-
-nav#lnb .item.parent-item { background: #f1eaa1}
-nav#lnb .item.child-item { background: white }
-nav#lnb .item.child-item .title{ padding-left: 32px !important}
+testing-page .notice.red { background-color: lightcoral }
+testing-page .notice.blue { background-color: #25a3f1}
 
 
 
-/* Main content (Test Area) */
-
-#tester-view #main {
-	overflow: auto;
-	height: calc(100% - 70px);
-}
-
-#main .container{
+testing-page .container{
 	padding: 15px;
 	height: 100%;
 }
 
 
-
-#main h3 {
+testing-page h3 {
 	margin: 20px 0 7px;
 	padding: 0 0 4px;
 	border-bottom: 1px #aaa solid;
@@ -75,34 +25,35 @@ nav#lnb .item.child-item .title{ padding-left: 32px !important}
 	-webkit-user-select: none;
 }
 
+testing-page pre{margin: 0; padding: 0}
 
 
-
-#main section.info {
+testing-page section.info {
 	margin-bottom: 1rem;
 	display:inline-block;
 }
 
-#main section.info > span {
+
+testing-page section.info > span {
 	display: block;
 }
 
-#main section.info h2 {
+testing-page section.info h2 {
 	margin: 0;
 	padding: 0;
 	font-size: 1.5rem;
 	font-weight: 200;
 }
 
-#main section.info .details {
+testing-page section.info .details {
 	font-size: 0.75rem;
 }
 
-#main section.buttons {
+testing-page section.buttons {
 	display: initial;
 }
 
-#main section.buttons button {
+testing-page section.buttons button {
 	background-color: #00af86; /* Green */
 	border: none;
 	color: white;
@@ -114,23 +65,22 @@ nav#lnb .item.child-item .title{ padding-left: 32px !important}
 	float: right;
 	outline: none;
 }
-#main section.buttons button:hover {
+testing-page section.buttons button:hover {
 	background-color: #00ca9b;
 	box-shadow: none;
 }
-#main section.buttons button:active {
+testing-page section.buttons button:active {
 	background-color: #009270;
 }
 
 
 
-#main section#test-set,
-#main section#result-set {
+testing-page section#test-set,
+testing-page section#result-set {
 	margin: 2px 8px 1px 1px;
 }
 
-#main section#test-set textarea,
-#main section#result-set textarea {
+testing-page section > textarea{
 	width: 100%;
 	height: 120px;
 	resize: none;
@@ -138,46 +88,40 @@ nav#lnb .item.child-item .title{ padding-left: 32px !important}
 }
 
 
-#foot-area {
-	margin-top: 20px;
-	margin-bottom: 5px;
-}
-
-
-#main #properties {
+testing-page #properties {
 	border-collapse: collapse;
 	width: 100%;
 }
 
-#main #properties tr:nth-of-type(2n+1) > * {
+testing-page #properties tr:nth-of-type(2n+1) > * {
 	background: #f5f5f5;
 }
 
-#main #properties th,
-#main #properties td {
+testing-page #properties th,
+testing-page #properties td {
 	width: 50%;
 	padding: 0.25rem 1rem;
 	font-weight: 200;
 }
 
-#main #properties th {
+testing-page #properties th {
 	text-align: right;
 	vertical-align: top;
 	border-right: 2px solid #d0d0d0;
 }
 
-#main #properties th span:before {
+testing-page #properties th span:before {
 	content: '';
 	display: inline-block;
 }
 
-#main #properties th span.required:before {
+testing-page #properties th span.required:before {
 	content: '*';
 	color: red;
 	margin-right: 0.5rem;
 }
 
-#main #properties th a.help {
+testing-page #properties th a.help {
 	display: inline-block;
 	margin-left: 0.5rem;
 	width: 1rem;
@@ -190,18 +134,23 @@ nav#lnb .item.child-item .title{ padding-left: 32px !important}
 	border-radius: 100px;
 }
 
-#main #properties td span.example {
+testing-page #properties td .example {
 	display: block;
-	font-size: 0.75rem;
+	font-size: 12px;
 	opacity: 0.8;
 }
 
-#main #properties textarea {
+testing-page #properties textarea {
 	width: 100%;
 	resize: none;
+	height: 1rem;
 }
 
 
+#foot-area {
+	margin-top: 20px;
+	margin-bottom: 5px;
+}
 
 
 #share-btn button {

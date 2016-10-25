@@ -24,7 +24,6 @@ sub{bottom:-.25em;}
 img{border:0; outline:none;}
 svg:not(:root){overflow:hidden;}
 fieldset{border:1px solid #c0c0c0;margin:0 2px;padding:.35em .625em .75em;}
-button,input,select,textarea{font-family:inherit;font-size:100%;margin:0;}
 button,input{line-height:normal;}
 button,select{text-transform:none;}
 button,html input[type=button],/* 1 */
@@ -39,6 +38,12 @@ body,figure{margin:0;}
 legend,button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0;}
 /* end of normalize.css */
 
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Open Sans'), local('OpenSans'), url('http://themes.googleusercontent.com/static/fonts/opensans/v5/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff') format('woff');
+}
 
 html, body {
 	width: 100%;
@@ -47,18 +52,13 @@ html, body {
 	padding: 0;
 }
 
-body {
-	overflow: hidden;
-	font-family: 'Open Sans', sans-serif;
-}
+body {overflow: hidden; }
 
 a{ text-decoration: none }
 
-@font-face {
-	font-family: 'Open Sans';
-	font-style: normal;
-	font-weight: 400;
-	src: local('Open Sans'), local('OpenSans'), url('http://themes.googleusercontent.com/static/fonts/opensans/v5/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff') format('woff');
+
+body,pre{
+	font-family: 'Open Sans', sans-serif;
 }
 
 textarea {
