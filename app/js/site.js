@@ -118,11 +118,12 @@ app.controller("TestingPageController", function($scope) {
 			},
 			(data) => {
 				console.log('stderr');
-				console.info(data);
+				console.info(data.toString());
 				$scope.notice = {
 					'color': 'blue',
 					'text': data.toString()
 				}
+				$scope.$apply();
 
 				// stderror
 		  	},
