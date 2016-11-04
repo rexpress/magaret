@@ -58,37 +58,65 @@
 			<code-mirror container="inputText" theme='tomorrow-night-eighties' line-numbers="true"></code-mirror>
 		</content>
 	</section>
-	<section id="result">
+	<section id="result" ng-show="!!resultSet.type">
 		<title>result</title>
-		<content>
-			<table id="result-table">
-				<tr>
-					<th>&nbsp;</th>
-					<th class="result-column" ng-repeat="columns in jsonResultSet.columns">
-						{{ columns }}
-					</th>
-				</tr>
-				<tr ng-repeat="resultSet in jsonResultSet.resultList track by $index" ng-rowspan="resultList.list.length" ng-show="!(jsonResultSet.resultList.length == 1 && jsonResultSet.resultList[0] == null)">
-						<td>
-							{{ $index + 1 }}
-						</td>
-						<td ng-repeat="res in resultSet.list[0] track by $index">
-						{{ res }}
-						</td>
-				</tr>
+		<content class="overflow-x-auto">
+			<table class="result-table" ng-show="resultSet.type == 'group'">
+				<thead>
+					<tr>
+						<th>&nbsp;</th>
+						<th ng-repeat="column in resultSet.columns track by $index">{{ column }}</th>
+						<th class="space"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="result in resultSet.list track by $index">
+						<td class="line-number"><div>{{ result[0] }}</div></td>
+						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
+						<td ng-repeat="item in result[1] track by $index" class="group-data" ng-show="result[1] != null"><div>{{ item }}</div></td>
+						<td class="space"><div>&nbsp;</div></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="result-table" ng-show="resultSet.type == 'string' || resultSet.type == 'match'">
+				<thead>
+					<tr>
+						<th>&nbsp;</th>
+						<th ng-repeat="column in resultSet.columns track by $index">{{ column }}</th>
+						<th class="space"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="result in resultSet.list track by $index">
+						<td class="line-number"><div>{{ $index + 1 }}</div></td>
+						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
+						
+						<td class="group-data bool-false" ng-show="result[1] == false"><div>{{ result[0] }}</div></td>
+						<td class="group-data bool-false" ng-show="result[1] == false"><div>{{ result[1] }}</div></td>
+						<td class="space bool-false" ng-show="result[1] == false"><div>&nbsp;</div></td>
+						
+						<td class="group-data bool-true" ng-show="result[1] == true"><div>{{ result[0] }}</div></td>
+						<td class="group-data bool-true" ng-show="result[1] == true"><div>{{ result[1] }}</div></td>
+						<td class="space bool-true" ng-show="result[1] == true"><div>&nbsp;</div></td>
+
+						<td class="group-data" ng-show="resultSet.type == 'string'"><div>{{ result[0] }}</div></td>
+						<td class="group-data" ng-show="resultSet.type == 'string'"><div><pre>{{ result[1] }}</pre></div></td>
+						<td class="space" ng-show="resultSet.type == 'string'"><div>&nbsp;</div></td>
+					</tr>
+				</tbody>
 			</table>
 		</content>
 	</section>
-	<section id="output">
+	<section id="output" ng-show="!!outputText.content">
 		<title>output</title>
 		<content>
-			<code-mirror container="outputText" theme='tomorrow-night-eighties' line-numbers="true"></code-mirror>
+			<code-mirror container="outputText" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
 		</content>
 	</section>
-	<section id="debug">
+	<section id="debug" ng-show="!!debugText.content">
 		<title>debug</title>
 		<content>
-			<code-mirror container="debugText" theme='tomorrow-night-eighties' line-wrapping="true" read-only="true" line-numbers="true"></code-mirror>
+			<code-mirror container="debugText" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
 		</content>
 	</section>
 	<div id="foot-area"></div>

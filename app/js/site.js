@@ -75,8 +75,11 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 			if (item.type == 'string')
 				$scope.property_value[item.name] = {
 					content: ''
-				};
+			};
 		}
+
+		// initialize resultset
+		$scope.resultSet = {};
 	};
 
   $scope.inputText = {
@@ -128,7 +131,11 @@ app.controller("TestingPageController", function($scope) {
 		$scope.testResultSet = null;
 		$scope.debugOutput = null;
 		$scope.notice = null;
+		$scope.resultSet = null;
 
+		$scope.inputText.this.getDoc().setValue('');
+		$scope.outputText.this.getDoc().setValue('');
+		$scope.debugText.this.getDoc().setValue('');
 	}
 
 	$scope.codemirrorLoaded = function(_editor){
@@ -139,11 +146,11 @@ app.controller("TestingPageController", function($scope) {
 
 	$scope.codemirrorInit = function() {
 		for (let a in $scope.property_value) {
-			if (!$scope.property_value.content) {
-				$scope.property_value[a].this.getDoc().setValue($scope.propertyInput[a]);
-			}
+			console.info('replace');
+			$scope.property_value[a].content = $scope.propertyInput[a];
 		}
 	}
+	
 
 	$scope.testForm = function() {
 		var docker_exec = (run, param, stdout, stderr, end) => {
@@ -163,32 +170,136 @@ app.controller("TestingPageController", function($scope) {
 		}
 
 		$scope.outputText.content = '';
+		$scope.jsonResultSet = null;
 		$scope.jsonResultSet = {};
+		$scope.resultSet = null;
+		$scope.resultSet = {};
+		$scope.outputText.this.getDoc().setValue('');
+		$scope.debugText.this.getDoc().setValue('');
 
 		const docker_image = $scope.selectedEnv.info.docker_image;
 		const property = JSON.stringify( $scope.propertyInput );
 		const testSet = JSON.stringify( $scope.inputText.content.split('\n') );
+		const testSetList = $scope.inputText.content.split('\n');
 		
 		var testResult;
 
+		console.info('property and testset');
+		console.info($scope.propertyInput);
+		console.info($scope.inputText.content.split('\n'));
+
+		var buffer = '';
 		docker_exec('docker', ['run', '--rm', '-i', docker_image, property, testSet],
 			(data) => {
 				// on stdout data received
-				var str = data.toString();
+				var str = buffer + data.toString();
 				var START_RESULT = '##START_RESULT##';
 				var END_RESULT = '##END_RESULT##';
 
+				if (str.substr(START_RESULT) == -1 || str.search(END_RESULT) == -1)
+				{
+					console.log('없음');
+					buffer += str;
+					return;
+				}
+
 				if (str.substr(START_RESULT) != -1 && str.search(END_RESULT) != -1) {
-					str = str.substr( START_RESULT.length );
+					buffer = '';
+					str = str.substr( str.search(START_RESULT) + START_RESULT.length );
 					str = str.substr( 0, str.search(END_RESULT) );
 
+					console.info(str);
 					testResult = JSON.parse(str);
 					console.log(testResult);
 
 
 					//$scope.inputText.content = 'teest';
 					$scope.outputText.this.getDoc().setValue(JSON.stringify(testResult.result));
-					$scope.debugText.this.getDoc().setValue(testResult.debugOutput.trim());
+					
+					console.info(testResult.debugOutput);
+					if (typeof testResult.debugOutput !== 'undefined')
+						$scope.debugText.this.getDoc().setValue(testResult.debugOutput.trim());
+
+					$scope.resultSet = null;
+					$scope.resultSet = {};
+
+					/* group result generate */
+					switch(testResult.type) {
+						case 'GROUP':
+						{
+							$scope.resultSet.type = 'group';
+							$scope.resultSet.columns = testResult.result.columns;
+
+							$scope.resultSet.list = null;
+							$scope.resultSet.list = [];
+							let res_num = 0;
+							let case_num = 0;
+							let max_column = 0;
+							for (let r in testResult.result.resultList) {
+								var list = [];
+								++res_num;
+
+								if (testResult.result.resultList[r] === null) {
+									list.push(res_num);
+									list.push(null);
+									$scope.resultSet.list.push(list);
+									continue;
+								}
+
+								case_num = 0;
+
+								for (let res of testResult.result.resultList[r].list) {
+									list.push((case_num++ ? '&nbsp' : res_num));
+									list.push(res);
+									if (res.length > max_column) max_column = res.length;
+								}
+
+								$scope.resultSet.list.push(list);
+							}
+
+							let alphabet = 65;
+							let max = 0;
+							if (!$scope.resultSet.columns.length) {
+
+								$scope.resultSet.columns = [];
+								for (let i = 0; i < max_column; i++)
+									$scope.resultSet.columns.push(String.fromCharCode(alphabet++));
+							}
+
+						}
+						break;
+						case 'STRING':
+						{
+							$scope.resultSet.type = 'string';
+							$scope.resultSet.list = null;
+							$scope.resultSet.list = [];
+							let res_num = 0;
+							for (res of testResult.result.resultList) {
+								var list = [];
+								list.push(testSetList[res_num++]);
+								list.push(res);
+								$scope.resultSet.list.push(list);
+							}
+							$scope.resultSet.columns = ['INPUT', 'RESULT'];
+						}
+						break;
+						case 'MATCH':
+						{
+							$scope.resultSet.type = 'match';
+							$scope.resultSet.list = null;
+							$scope.resultSet.list = [];
+							let res_num = 0;
+							for (res of testResult.result.resultList) {
+								var list = [];
+								list.push(testSetList[res_num++]);
+								list.push(res);
+								$scope.resultSet.list.push(list);
+							}
+							$scope.resultSet.columns = ['STRING', 'BOOLEAN'];
+						break;
+						}
+					}
+					console.info($scope.resultSet);
 
 					$scope.testResultSet = JSON.stringify(testResult.result);
 					$scope.jsonResultSet = testResult.result;
@@ -326,6 +437,7 @@ app.directive('codeMirror', ['$timeout', function($timeout) {
           else if(oldValue === '' && newValue === '') {
             unwatch();
           }
+					myCodeMirror.refresh();
         });
 
 				scope.container.this = myCodeMirror;
@@ -360,8 +472,8 @@ app.directive('codeMirror', ['$timeout', function($timeout) {
         // });
 
 				// word-wrap to codemirror
-				scope.$watch('wordwrap', function(oldValue, newValue) {
-					myCodeMirror.setOption('lineWrapping', scope.wordwrap);
+				scope.$watch('lineWrapping', function(oldValue, newValue) {
+					myCodeMirror.setOption('lineWrapping', scope.lineWrapping);
 				})
 
         // Set the codemirror value to the scope

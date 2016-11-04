@@ -105,8 +105,6 @@ testing-page section.buttons button:active {
 	background-color: #0d2748;
 }
 
-
-
 testing-page section#test-set,
 testing-page section#result-set {
 	margin: 2px 8px 1px 1px;
@@ -286,6 +284,85 @@ testing-page [data-tooltip-text]:hover:after {
 	top: 130%;
 	left: 0;
 	opacity: 1;
+}
+
+table.result-table {
+	width: 100%;
+	border: none;
+	outline: none;
+	font-size: 15px;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	background-color: white;
+}
+
+.result-table tr th {
+	text-align: center;
+	border-bottom: 2px solid #11b9b9;
+	background-color: #c6eaea !important;
+	color: #004848;
+	font-weight: bold;
+	padding: 4px 7px;
+}
+
+.result-table td, .result-table pre {
+	line-height: 1.5;
+	font-size: 15px;
+	font-family: monospace;
+	white-space: nowrap;
+}
+
+.result-table pre {
+	white-space: pre;
+	text-align: left;
+}
+
+.result-table td.group-data {
+	text-align: center;
+	border-right: 1px solid #ddd;
+}
+.result-table tr td.group-data > div {
+	min-width: 90px;
+	text-align: center;
+	padding: 4px 25px;
+}
+
+.result-table tr:nth-of-type(2n+1) > * {
+	background: #f5f5f5;
+}
+
+.result-table td.space > div {
+	min-width: 180px;
+	margin-left: -180px;
+	width: auto;
+	padding: 4px 25px;
+}
+
+.result-table td.group-data-null {
+	text-align: center;
+	font-style: italic;
+	color: #777;
+}
+
+.result-table td.line-number {
+	width: 44px;
+	min-width: 44px;
+	text-align: right;
+	border-right: 2px solid #11b9b9;
+	-webkit-user-select: none;
+	cursor: default;
+	color: #999;
+	background: #f7f7f7;
+	padding: 2px 8px 2px 2px;
+}
+
+.result-table .bool-true {
+	background: #0a9bff !important;
+  color: white !important;
+}
+
+.overflow-x-auto {
+	overflow-x: auto;
 }
 
 #foot-area {
