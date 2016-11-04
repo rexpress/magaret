@@ -166,6 +166,10 @@ app.controller("TestingPageController", function ($scope) {
 		$scope.inputText.this.setValue('');
 		$scope.outputText.this.setValue('');
 		$scope.debugText.this.setValue('');
+
+		for (let p in $scope.propertyString) {
+			$scope.propertyString[p].this.setValue('');
+		}
 	}
 
 	$scope.codemirrorLoaded = function (_editor) {
