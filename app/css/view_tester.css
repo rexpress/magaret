@@ -1,0 +1,83 @@
+@charset "utf-8";
+
+#tester-view{
+	height: 100%;
+}
+
+#tester-view aside {
+	width: 255px;
+	height: 100%;
+	background: white;
+	float: left;
+	height: calc(100% - 62px);
+	overflow: auto;
+}
+
+#tester-view aside > form {
+	padding: 10px;
+}
+
+#tester-view aside > form > input {
+	width: 100%;
+	font-size: 1rem;
+	-webkit-appearance: searchfield;
+	box-sizing: border-box;
+}
+
+
+/* lnb section */
+nav#lnb ul{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+nav#lnb ul li{
+	margin: 0;
+	padding: 0;
+}
+
+
+nav#lnb .item {
+	padding: 8px 0px 8px 10px;
+	display: block;
+	color: black;
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 14px;
+}
+
+
+nav#lnb .item.parent-item {
+	background: #123765;
+	color: white;
+	pointer-events: none;
+}
+nav#lnb .item.child-item {
+	background: white;
+	cursor: pointer;	
+}
+nav#lnb .item.child-item .title{
+	padding-left: 32px !important;
+}
+
+nav#lnb .item.selected {
+	background: #0a9bff !important;
+	color: white !important;
+}
+
+nav#lnb .item:hover {
+    background: #eee;
+}
+
+[class^=devicon-] {
+	margin-right: 4px;
+}
+
+/* Main content (Test Area) */
+
+#tester-view #main {
+	overflow-x: hidden;
+	overflow-y: auto;
+	height: calc(100% - 62px);
+	background: #eee;
+}

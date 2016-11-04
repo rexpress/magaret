@@ -1,0 +1,34 @@
+<div id="tester-view">
+	<aside>
+		<!--<form class="search" role="search">
+			<input type="search" style="" disabled class="search-input" placeholder="Search…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="30" aria-label="Search">
+			<div class="search-tag"></div>
+		</form>//-->
+		<nav id="lnb">
+			<ul>
+				<li ng-repeat="envGroup in envInfo">
+					<div class="item parent-item">
+						<span class="icon" ng-switch on="envGroup.info.icon.type">
+							<i ng-switch-when="devicon" class="devicon-{{ envGroup.info.icon.value }}-plain"></i>
+							<img ng-switch-when="image" ng-src="{{ envGroup.info.icon.value }}">
+						</span>
+						<span class="title">{{ envGroup.name }}</span>
+					</div>
+					<ul class="sub-list">
+						<li ng-repeat="envChild in envGroup.children">
+							<div class="item child-item" ng:class="selectedEnv == envChild && 'selected'" ng-click="loadEnv(envChild)">
+								<span class="title">{{ envChild.name }}</span>
+							</div>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+	</aside>
+	<section id="main">
+		<standby ng-hide="selectedEnv"></standby>
+		<testing-page ng-show="selectedEnv" ng-controller="TestingPageController"></testing-page>
+	</section>
+</div>
+
+

@@ -1,0 +1,85 @@
+@charset "utf-8";
+
+a:hover, a:active, a:focus {
+  outline: 0;
+}
+
+header {
+	padding: 10px 30px;
+	background-color: #0d2748;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+header #logo {
+	width: 200px;
+	height: 2.5rem;
+	display: inline-block;
+}
+
+header #logo a {
+	width: inherit;
+	height: inherit;
+}
+
+header #logo #logo-content {
+	width: inherit;
+	height: inherit;
+	background-image: url(../images/logo-white.png);
+	background-repeat: no-repeat;
+	background-size: 200px;
+	background-position-y: 3px;
+}
+
+header ul#gnb {
+	list-style: none;
+	margin: 10px 0 0 40px;
+	padding: 0;
+}
+
+header ul#gnb li {
+	margin: 0 13px;
+	padding: 0;
+	float: left;
+}
+
+header ul#gnb li a {
+	text-decoration: none;
+	font-size: 14px;
+	color: #bbb;
+}
+
+header ul#gnb li a:hover {
+  color: #ddd;
+}
+
+header ul#gnb li a.selected {
+	color: white
+}
+
+header #propic {
+	padding: 10px 0px;
+}
+
+header #propic a {
+	text-decoration: none;
+	font-size: 14px;
+	color: white;
+}
+
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+section#content{
+	height: 100%;
+}
+
+menu {
+	padding: 0;
+	margin: 0;
+}

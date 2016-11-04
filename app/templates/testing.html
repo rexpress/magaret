@@ -1,0 +1,114 @@
+<pre ng-show="_notice" class="notice {{ _notice.color }}">{{ _notice.text }}</pre>
+
+<div class="container">
+	<div class="header">
+		<section class="info">
+			<h2>{{ selectedEnv.info.title }}</h2>
+			<span class="description">{{ selectedEnv.info.description }}</span>
+			<span class="details">
+				<span>By {{ selectedEnv.info.author }}</span> |
+				<span>Version: {{ selectedEnv.info.version }}</span> |
+				<span>Image: {{ selectedEnv.info.docker_image }}</span>
+			</span>
+		</section>
+		<section class="buttons">
+			<button ng-click="testForm()">Test</button>
+			<button ng-click="resetForm()">Reset</button>
+		</section>
+	</div>
+	<section id="property">
+		<title>properties</title>
+		<content>
+			<!--<table>
+				<tr ng-repeat="property in selectedEnv.info.properties">
+					<td class="key">{{ property.name }}
+					</td>
+					<td class="value">{{ property.example }}
+					</td>
+				</tr>
+			</table>-->
+			<table id="properties">
+				<input type="hidden" value="extractor" data-name="test_type">
+
+				<tr ng-repeat="property in selectedEnv.info.properties" ng-show="property.type != 'hidden'">
+					<th>
+						<span ng:class="property.required && 'required'" title="{{ property.name }}">{{ property.name }}</span>
+						<a class="help" data-tooltip-text="{{ property.help }}">?</a>
+					</th>
+					<td>
+						<div ng-switch on="property.type">
+							
+							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" content="{{ property.example }}" container="propertyString[property.name]" theme='tomorrow-night-eighties' line-numbers="false"></code-mirror>
+
+							<!--<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>-->
+							<input  ng-switch-when="number"  type="number"   ng-model="propertyInput[property.name]">
+							<input  ng-switch-when="boolean" type="checkbox" ng-model="propertyInput[property.name]"></textarea>
+							<select ng-switch-when="list" ng-model="propertyInput[property.name]" ng-option="property.list"></select>
+						</div>
+
+						<pre ng-show="property.type == 'string' || property.type == 'number'" class="example">example: {{ property.example }}</pre>
+					</td>
+				</tr>
+			</table>
+		</content>
+	</section>
+	<section id="input">
+		<title>input</title>
+		<content>
+			<code-mirror container="inputText" theme='tomorrow-night-eighties' line-numbers="true"></code-mirror>
+		</content>
+	</section>
+	<section id="result" ng-show="!!resultSet.type">
+		<title>result</title>
+		<content class="overflow-x-auto">
+			<table class="result-table" ng-show="resultSet.type == 'group'">
+				<thead>
+					<tr>
+						<th>&nbsp;</th>
+						<th ng-repeat="column in resultSet.columns track by $index">{{ column }}</th>
+						<th class="space"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="result in resultSet.list track by $index">
+						<td class="line-number"><div>{{ result[0] }}</div></td>
+						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
+						<td ng-repeat="item in result[1] track by $index" class="group-data" ng-show="result[1] != null"><div>{{ item }}</div></td>
+						<td class="space"><div>&nbsp;</div></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="result-table" ng-show="resultSet.type == 'string' || resultSet.type == 'match'">
+				<thead>
+					<tr>
+						<th>&nbsp;</th>
+						<th ng-repeat="column in resultSet.columns track by $index">{{ column }}</th>
+						<th class="space"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="result in resultSet.list track by $index">
+						<td class="line-number"><div>{{ $index + 1 }}</div></td>
+						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
+						<td class="group-data" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>{{ result[0] }}</div></td>
+						<td class="group-data" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>{{ result[1] }}</div></td>
+						<td class="space" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>&nbsp;</div></td>
+					</tr>
+				</tbody>
+			</table>
+		</content>
+	</section>
+	<section id="output" ng-show="!!outputText.content">
+		<title>output</title>
+		<content>
+			<code-mirror container="outputText" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
+		</content>
+	</section>
+	<section id="debug" ng-show="!!debugText.content">
+		<title>debug</title>
+		<content>
+			<code-mirror container="debugText" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
+		</content>
+	</section>
+	<div id="foot-area"></div>
+</div>
