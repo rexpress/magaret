@@ -164,6 +164,9 @@ app.controller("TestingPageController", function($scope) {
 		$scope._notice = null;
 		$scope.resultSet = null;
 		$scope.result = null;
+		$scope.inputText.this.setValue('');
+		$scope.outputText.this.setValue('');
+		$scope.debugText.this.setValue('');
 	}
 
 	$scope.codemirrorLoaded = function(_editor){

@@ -90,9 +90,9 @@
 					<tr ng-repeat="result in resultSet.list track by $index">
 						<td class="line-number"><div>{{ $index + 1 }}</div></td>
 						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
-						<td class="group-data" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>{{ result[0] }}</div></td>
-						<td class="group-data" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>{{ result[1] }}</div></td>
-						<td class="space" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>&nbsp;</div></td>
+						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''"><div>{{ result[0] }}</div></td>
+						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''"><div>{{ result[1] }}</div></td>
+						<td class="space" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''"><div>&nbsp;</div></td>
 					</tr>
 				</tbody>
 			</table>
