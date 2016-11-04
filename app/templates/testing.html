@@ -7,8 +7,8 @@
 			<span class="description">{{ selectedEnv.info.description }}</span>
 			<span class="details">
 				<span>By {{ selectedEnv.info.author }}</span> |
-				<span>Version: {{ selectedEnv.info.version }}</span> |
-				<span>Image: {{ selectedEnv.info.docker_image }}</span>
+			<span>Version: {{ selectedEnv.info.version }}</span> |
+			<span>Image: {{ selectedEnv.info.docker_image }}</span>
 			</span>
 		</section>
 		<section class="buttons">
@@ -37,12 +37,13 @@
 					</th>
 					<td>
 						<div ng-switch on="property.type">
-							
-							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" content="{{ property.example }}" container="propertyString[property.name]" theme='tomorrow-night-eighties' line-numbers="false"></code-mirror>
+
+							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" content="{{ property.example }}" container="propertyString[property.name]"
+								theme='tomorrow-night-eighties' line-numbers="false"></code-mirror>
 
 							<!--<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>-->
-							<input  ng-switch-when="number"  type="number"   ng-model="propertyInput[property.name]">
-							<input  ng-switch-when="boolean" type="checkbox" ng-model="propertyInput[property.name]"></textarea>
+							<input ng-switch-when="number" type="number" ng-model="propertyInput[property.name]">
+							<input ng-switch-when="boolean" type="checkbox" ng-model="propertyInput[property.name]"></textarea>
 							<select ng-switch-when="list" ng-model="propertyInput[property.name]" ng-option="property.list"></select>
 						</div>
 
@@ -71,10 +72,18 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="result in resultSet.list track by $index">
-						<td class="line-number"><div>{{ result[0] }}</div></td>
-						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
-						<td ng-repeat="item in result[1] track by $index" class="group-data" ng-show="result[1] != null"><div>{{ item }}</div></td>
-						<td class="space"><div>&nbsp;</div></td>
+						<td class="line-number">
+							<div>{{ result[0] }}</div>
+						</td>
+						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null">
+							<div>Null</div>
+						</td>
+						<td ng-repeat="item in result[1] track by $index" class="group-data" ng-show="result[1] != null">
+							<div>{{ item }}</div>
+						</td>
+						<td class="space">
+							<div>&nbsp;</div>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -88,11 +97,21 @@
 				</thead>
 				<tbody>
 					<tr ng-repeat="result in resultSet.list track by $index">
-						<td class="line-number"><div>{{ $index + 1 }}</div></td>
-						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
-						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''"><div>{{ result[0] }}</div></td>
-						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''"><div>{{ result[1] }}</div></td>
-						<td class="space" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''"><div>&nbsp;</div></td>
+						<td class="line-number">
+							<div>{{ $index + 1 }}</div>
+						</td>
+						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null">
+							<div>Null</div>
+						</td>
+						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
+							<div>{{ result[0] }}</div>
+						</td>
+						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
+							<div>{{ result[1] }}</div>
+						</td>
+						<td class="space" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
+							<div>&nbsp;</div>
+						</td>
 					</tr>
 				</tbody>
 			</table>

@@ -25,7 +25,7 @@ app.run(function ($rootScope) {
 	$rootScope.openBrowser = (url) => {
 		require('electron').shell.openExternal(url);
 	};
-		
+
 
 	$rootScope.showRight = (e) => {
 		$rootScope.rightVisible = true;
@@ -55,17 +55,17 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 
 	if (envInfo)
 		$scope.envInfo = envInfo;
-	else{
+	else {
 		$scope.envInfo = {};
 
-		Environments.load(function(result) {
+		Environments.load(function (result) {
 			$scope.envInfo = result;
 			CacheLib.write('envInfo', result);
 		});
 	}
 
 	$scope.selectedEnv = null;
-	$scope.loadEnv = function(env) {
+	$scope.loadEnv = function (env) {
 		$scope.selectedEnv = env;
 
 		// initialize resultSet object
@@ -77,10 +77,10 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 			if (item.type == 'string')
 				$scope.propertyString[item.name] = {
 					content: ''
-			};
+				};
 		}
 	};
-	
+
 	for (let init of ['inputText', 'outputText', 'debugText']) {
 		$scope[init] = {
 			content: ''
@@ -91,13 +91,13 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 
 
 app.controller("HistoryController", function ($scope, $rootScope) {
-	
+
 });
 
 
 
 
-app.controller("TestingPageController", function($scope) {
+app.controller("TestingPageController", function ($scope) {
 	// On selected Env is changed
 	$scope.$watch('selectedEnv', initPropertyData);
 
@@ -109,7 +109,7 @@ app.controller("TestingPageController", function($scope) {
 			$scope.$apply();
 			$scope.notice.timestamp = 0;
 		},
-		info: (msg,t) => {
+		info: (msg, t) => {
 			$scope._notice = {
 				'color': 'blue',
 				'text': msg
@@ -118,7 +118,7 @@ app.controller("TestingPageController", function($scope) {
 			$scope.$apply();
 			$scope.notice.timestamp = Date.now() + (t ? t : tick);
 		},
-		err: (msg,t) => {
+		err: (msg, t) => {
 			$scope._notice = {
 				'color': 'red',
 				'text': msg
@@ -131,8 +131,7 @@ app.controller("TestingPageController", function($scope) {
 
 	(function watchNotice() {
 		if ($scope.notice.timestamp &&
-				$scope.notice.timestamp < Date.now())
-		{
+			$scope.notice.timestamp < Date.now()) {
 			$scope.notice.hide();
 			$scope.$apply();
 		}
@@ -149,11 +148,11 @@ app.controller("TestingPageController", function($scope) {
 		propertyInput = {};
 		for (var prop of $scope.selectedEnv.info.properties) {
 			if (prop.value)
-				propertyInput[ prop.name ] = prop.value;
+				propertyInput[prop.name] = prop.value;
 			else if (prop.default !== undefined)
-				propertyInput[ prop.name ] = prop.default;
+				propertyInput[prop.name] = prop.default;
 			else // example placeholder
-				propertyInput[ prop.name ] = prop.example;
+				propertyInput[prop.name] = prop.example;
 		}
 
 		$scope.propertyInput = propertyInput;
@@ -169,19 +168,19 @@ app.controller("TestingPageController", function($scope) {
 		$scope.debugText.this.setValue('');
 	}
 
-	$scope.codemirrorLoaded = function(_editor){
+	$scope.codemirrorLoaded = function (_editor) {
 		// Events
-		_editor.on("beforeChange", function(){ _editor.refresh() });
-		_editor.on("change", function(){ _editor.refresh() });
+		_editor.on("beforeChange", function () { _editor.refresh() });
+		_editor.on("change", function () { _editor.refresh() });
 	};
 
-	$scope.codemirrorInit = function() {
+	$scope.codemirrorInit = function () {
 		for (let a in $scope.propertyString) {
 			$scope.propertyString[a].content = $scope.propertyInput[a];
 		}
 	}
-	
-	$scope.testForm = function() {
+
+	$scope.testForm = function () {
 		for (var p in $scope.propertyString) {
 			$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();;
 		}
@@ -196,7 +195,7 @@ app.controller("TestingPageController", function($scope) {
 
 		let initField = (() => {
 			$scope.outputText.this.getDoc().setValue('');
-		 	$scope.debugText.this.getDoc().setValue('');
+			$scope.debugText.this.getDoc().setValue('');
 			$scope.resultSet = null;
 		})();
 
@@ -211,54 +210,54 @@ app.controller("TestingPageController", function($scope) {
 			// l = alphabet
 			// m = max
 			let i = 0, j = 0, k = 1, l = 65, m = 0;
-			switch(data.type) {
+			switch (data.type) {
 				case 'GROUP':
-				{
-					resultSet.type = 'group';
-					resultSet.columns = data.result.columns;
+					{
+						resultSet.type = 'group';
+						resultSet.columns = data.result.columns;
 
-					for (let a in data.result.resultList) {
-						++i;
+						for (let a in data.result.resultList) {
+							++i;
 
-						if (data.result.resultList[a] === null) {
-							resultSet.list.push([i, null]);
-							continue;
+							if (data.result.resultList[a] === null) {
+								resultSet.list.push([i, null]);
+								continue;
+							}
+
+							j = 0;
+
+							for (let res of data.result.resultList[a].list) {
+								resultSet.list.push([(j++ ? ' ' : i), res]);
+								if (res.length > k) k = res.length;
+							}
 						}
 
-						j = 0;
-
-						for (let res of data.result.resultList[a].list) {
-							resultSet.list.push([(j++ ? ' ' : i), res]);
-							if (res.length > k) k = res.length;
+						if (!resultSet.columns.length) {
+							resultSet.columns = [];
+							for (let i = 0; i < k; i++)
+								resultSet.columns.push(String.fromCharCode(l++));
 						}
 					}
-
-					if (!resultSet.columns.length) {
-						resultSet.columns = [];
-						for (let i = 0; i < k; i++)
-							resultSet.columns.push(String.fromCharCode(l++));
-					}
-				}
-				break;
+					break;
 				case 'STRING':
-				{
-					resultSet.type = 'string';
-					let i = 0;
-					for (res of data.result.resultList) {
-						resultSet.list.push([env.testset[i++], res]);
+					{
+						resultSet.type = 'string';
+						let i = 0;
+						for (res of data.result.resultList) {
+							resultSet.list.push([env.testset[i++], res]);
+						}
+						resultSet.columns = ['INPUT', 'RESULT'];
 					}
-					resultSet.columns = ['INPUT', 'RESULT'];
-				}
-				break;
+					break;
 				case 'MATCH':
-				{
-					resultSet.type = 'match';
-					for (res of data.result.resultList) {
-						resultSet.list.push([env.testset[i++], res]);
+					{
+						resultSet.type = 'match';
+						for (res of data.result.resultList) {
+							resultSet.list.push([env.testset[i++], res]);
+						}
+						resultSet.columns = ['STRING', 'BOOLEAN'];
+						break;
 					}
-					resultSet.columns = ['STRING', 'BOOLEAN'];
-				break;
-				}
 				default:
 					return resultSet;
 			}
@@ -273,18 +272,18 @@ app.controller("TestingPageController", function($scope) {
 					if (d.data.debugOutput) $scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
 					if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 5000);
 					$scope.$apply();
-				break;
+					break;
 				case 'log':
 					$scope.notice.info(d.data, 5000);
-				break;
+					break;
 				case 'end':
-				break;
+					break;
 			}
 		});
 	}
 
 
-	$scope.resetForm = function() {
+	$scope.resetForm = function () {
 		initPropertyData();
 	};
 })
@@ -303,103 +302,103 @@ app.directive("testingPage", function () {
 	};
 });
 
-app.directive('codeMirror', ['$timeout', function($timeout) {
-  return {
-      restrict: 'E',
-      replace: true,
-      templateUrl: 'templates/codeMirror.html',
-      scope: {
-        container: '=',
-        theme: '@',
-        lineNumbers: '@',
-				lineWrapping: '@',
-				readOnly: '@',
-				content: '@',
-      },
-      link: function(scope, element, attrs) {
-        var textarea = element.find('textarea')[0];
-        var showLineNumbers = scope.lineNumbers === 'true' ? true : false;
-        var codeMirrorConfig = {
-          lineNumbers: showLineNumbers,
-          mode: scope.syntax || 'javascript',
-          matchBrackets: true,
-          theme: scope.theme || 'default',
-          value: scope.content || '',
-					lineWrapping: scope.lineWrapping === 'true' ? true : false,
-					readOnly: scope.readOnly === 'true' ? true : false,
-					tabMode: 'default',
-        };
-        scope.syntax = 'javascript';
-        var myCodeMirror = CodeMirror.fromTextArea(textarea, codeMirrorConfig);
-				myCodeMirror.getDoc().setValue(scope.content || '');
+app.directive('codeMirror', ['$timeout', function ($timeout) {
+	return {
+		restrict: 'E',
+		replace: true,
+		templateUrl: 'templates/codeMirror.html',
+		scope: {
+			container: '=',
+			theme: '@',
+			lineNumbers: '@',
+			lineWrapping: '@',
+			readOnly: '@',
+			content: '@',
+		},
+		link: function (scope, element, attrs) {
+			var textarea = element.find('textarea')[0];
+			var showLineNumbers = scope.lineNumbers === 'true' ? true : false;
+			var codeMirrorConfig = {
+				lineNumbers: showLineNumbers,
+				mode: scope.syntax || 'javascript',
+				matchBrackets: true,
+				theme: scope.theme || 'default',
+				value: scope.content || '',
+				lineWrapping: scope.lineWrapping === 'true' ? true : false,
+				readOnly: scope.readOnly === 'true' ? true : false,
+				tabMode: 'default',
+			};
+			scope.syntax = 'javascript';
+			var myCodeMirror = CodeMirror.fromTextArea(textarea, codeMirrorConfig);
+			myCodeMirror.getDoc().setValue(scope.content || '');
 
-				scope.container.this = myCodeMirror;
-				myCodeMirror.getGutterElement().style['width'] = '59px'; /* 2.071428571 * 23 + 'px';*/
-				myCodeMirror.getGutterElement().style['marginLeft'] = '-5px';
-				
-				(function tryRefresh() {
-					myCodeMirror.refresh();
-						setTimeout(tryRefresh, 100);
-				})();
+			scope.container.this = myCodeMirror;
+			myCodeMirror.getGutterElement().style['width'] = '59px'; /* 2.071428571 * 23 + 'px';*/
+			myCodeMirror.getGutterElement().style['marginLeft'] = '-5px';
 
-				// word-wrap to codemirror
-				scope.$watch('lineWrapping', function(oldValue, newValue) {
-					myCodeMirror.setOption('lineWrapping', scope.lineWrapping);
-				})
+			(function tryRefresh() {
+				myCodeMirror.refresh();
+				setTimeout(tryRefresh, 100);
+			})();
 
-        // Set the codemirror value to the scope
-        myCodeMirror.on('change', function(e) {
-          $timeout(function() {
-            scope.container.content = myCodeMirror.getValue();
-          }, 300);
-        });
+			// word-wrap to codemirror
+			scope.$watch('lineWrapping', function (oldValue, newValue) {
+				myCodeMirror.setOption('lineWrapping', scope.lineWrapping);
+			})
 
-      }
-    };
-  }
+			// Set the codemirror value to the scope
+			myCodeMirror.on('change', function (e) {
+				$timeout(function () {
+					scope.container.content = myCodeMirror.getValue();
+				}, 300);
+			});
+
+		}
+	};
+}
 ]);
 
 /*                */
 /* temporary code */
 /*                */
-app.controller("modalDemo", function($scope, $rootScope) {
+app.controller("modalDemo", function ($scope, $rootScope) {
 });
 
-app.run(function($rootScope) {
-	document.addEventListener("keyup", function(e) {
+app.run(function ($rootScope) {
+	document.addEventListener("keyup", function (e) {
 		if (e.keyCode === 27)
 			$rootScope.$broadcast("escapePressed", e.target);
 	});
-					
-					document.addEventListener("click", function(e) {
-							$rootScope.$broadcast("documentClicked", e.target);
-					});
+
+	document.addEventListener("click", function (e) {
+		$rootScope.$broadcast("documentClicked", e.target);
+	});
 });
 
-app.directive("menu", function() {
+app.directive("menu", function () {
 	return {
 		restrict: "E",
 		template: "<div ng-class='{ show: visible, left: alignment === \"left\", right: alignment === \"right\" }' ng-transclude></div>",
 		transclude: true,
-							scope: {
-									visible: "=",
-									alignment: "@"
-							}
+		scope: {
+			visible: "=",
+			alignment: "@"
+		}
 	};
 });
-			
-app.directive("menuItem", function() {
-			return {
-					restrict: "E",
-					template: "<div ng-click='navigate()' ng-transclude></div>",
-					transclude: true,
-					scope: {
-							hash: "@"
-					},
-					link: function($scope) {
-							$scope.navigate = function() {
-									window.location.hash = $scope.hash;
-							}
-					}
+
+app.directive("menuItem", function () {
+	return {
+		restrict: "E",
+		template: "<div ng-click='navigate()' ng-transclude></div>",
+		transclude: true,
+		scope: {
+			hash: "@"
+		},
+		link: function ($scope) {
+			$scope.navigate = function () {
+				window.location.hash = $scope.hash;
 			}
+		}
+	}
 });
