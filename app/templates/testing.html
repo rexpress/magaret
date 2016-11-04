@@ -38,7 +38,7 @@
 					<td>
 						<div ng-switch on="property.type">
 							
-							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" container="property_value[property.name]" theme='tomorrow-night-eighties' line-numbers="false"></code-mirror>
+							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" content="{{ property.example }}" container="propertyString[property.name]" theme='tomorrow-night-eighties' line-numbers="false"></code-mirror>
 
 							<!--<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>-->
 							<input  ng-switch-when="number"  type="number"   ng-model="propertyInput[property.name]">
@@ -90,9 +90,9 @@
 					<tr ng-repeat="result in resultSet.list track by $index">
 						<td class="line-number"><div>{{ $index + 1 }}</div></td>
 						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
-						<td class="group-data" ng:class="result[1] == 'false' && 'bool-false' || result[1] == 'true' && 'bool-true' || ''"><div>{{ result[0] }}</div></td>
-						<td class="group-data" ng:class="result[1] == 'false' && 'bool-false' || result[1] == 'true' && 'bool-true' || ''"><div>{{ result[1] }}</div></td>
-						<td class="space" ng:class="result[1] == 'false' && 'bool-false' || result[1] == 'true' && 'bool-true' || ''"><div>&nbsp;</div></td>
+						<td class="group-data" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>{{ result[0] }}</div></td>
+						<td class="group-data" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>{{ result[1] }}</div></td>
+						<td class="space" ng:class="result[1] == false && 'bool-false' || result[1] == true && 'bool-true' || ''"><div>&nbsp;</div></td>
 					</tr>
 				</tbody>
 			</table>

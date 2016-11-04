@@ -68,33 +68,24 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 	$scope.loadEnv = function(env) {
 		$scope.selectedEnv = env;
 
-		// initialize code mirror object
-		$scope.codeMirror = {};
+		// initialize resultSet object
+		$scope.resultSet = {};
 
 		// assignment to property value
-		$scope.property_value = {};
+		$scope.propertyString = {};
 		for (let item of env.info.properties) {
 			if (item.type == 'string')
-				$scope.property_value[item.name] = {
+				$scope.propertyString[item.name] = {
 					content: ''
 			};
 		}
-
-		// initialize resultset
-		$scope.resultSet = {};
 	};
-
-  $scope.inputText = {
-    content: ''
-  };
-
-  $scope.outputText = {
-    content: ''
-  };
 	
-	$scope.debugText = {
-    content: ''
-  };
+	for (let init of ['inputText', 'outputText', 'debugText']) {
+		$scope[init] = {
+			content: ''
+		}
+	}
 });
 
 
@@ -173,10 +164,6 @@ app.controller("TestingPageController", function($scope) {
 		$scope._notice = null;
 		$scope.resultSet = null;
 		$scope.result = null;
-
-		$scope.inputText.this.getDoc().setValue(''); //err?
-		$scope.outputText.this.getDoc().setValue('');
-		$scope.debugText.this.getDoc().setValue('');
 	}
 
 	$scope.codemirrorLoaded = function(_editor){
@@ -186,17 +173,21 @@ app.controller("TestingPageController", function($scope) {
 	};
 
 	$scope.codemirrorInit = function() {
-		for (let a in $scope.property_value) {
-			$scope.property_value[a].content = $scope.propertyInput[a];
+		for (let a in $scope.propertyString) {
+			$scope.propertyString[a].content = $scope.propertyInput[a];
 		}
 	}
 	
 	$scope.testForm = function() {
+		for (var p in $scope.propertyString) {
+			$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();;
+		}
+
 		let env = (() => {
 			return {
 				image: $scope.selectedEnv.info.docker_image,
 				property: $scope.propertyInput,
-				testset: $scope.inputText.content.split('\n'),
+				testset: $scope.inputText.this.getValue().split('\n'),
 			}
 		})();
 
@@ -225,7 +216,6 @@ app.controller("TestingPageController", function($scope) {
 
 					for (let a in data.result.resultList) {
 						++i;
-						console.log(a);
 
 						if (data.result.resultList[a] === null) {
 							resultSet.list.push([i, null]);
@@ -235,9 +225,9 @@ app.controller("TestingPageController", function($scope) {
 						j = 0;
 
 						for (let res of data.result.resultList[a].list) {
+							resultSet.list.push([(j++ ? ' ' : i), res]);
 							if (res.length > k) k = res.length;
 						}
-						resultSet.list.push([(j++ ? ' ' : i), res]);
 					}
 
 					if (!resultSet.columns.length) {
@@ -269,12 +259,10 @@ app.controller("TestingPageController", function($scope) {
 				default:
 					return resultSet;
 			}
-			console.info(resultSet);
 			return resultSet;
 		});
 
 		mg_docker.exec(env.image, env.property, env.testset, d => {
-			console.log(d);
 			switch (d.type) {
 				case 'result':
 					$scope.resultSet = resultGenerate(d.data);
@@ -312,54 +300,6 @@ app.directive("testingPage", function () {
 	};
 });
 
-
-// tester
-
-			app.controller("modalDemo", function($scope, $rootScope) {
-			});
-
-			app.run(function($rootScope) {
-				document.addEventListener("keyup", function(e) {
-					if (e.keyCode === 27)
-						$rootScope.$broadcast("escapePressed", e.target);
-				});
-                
-                document.addEventListener("click", function(e) {
-                    $rootScope.$broadcast("documentClicked", e.target);
-                });
-			});
-			
-			app.directive("menu", function() {
-				return {
-					restrict: "E",
-					template: "<div ng-class='{ show: visible, left: alignment === \"left\", right: alignment === \"right\" }' ng-transclude></div>",
-					transclude: true,
-                    scope: {
-                        visible: "=",
-                        alignment: "@"
-                    }
-				};
-			});
-            
-            app.directive("menuItem", function() {
-                 return {
-                     restrict: "E",
-                     template: "<div ng-click='navigate()' ng-transclude></div>",
-                     transclude: true,
-                     scope: {
-                         hash: "@"
-                     },
-                     link: function($scope) {
-                         $scope.navigate = function() {
-                             window.location.hash = $scope.hash;
-                         }
-                     }
-                 }
-            });
-
-
-
-
 app.directive('codeMirror', ['$timeout', function($timeout) {
   return {
       restrict: 'E',
@@ -381,62 +321,23 @@ app.directive('codeMirror', ['$timeout', function($timeout) {
           mode: scope.syntax || 'javascript',
           matchBrackets: true,
           theme: scope.theme || 'default',
-          value: scope.content || 'asdfa',
+          value: scope.content || '',
 					lineWrapping: scope.lineWrapping === 'true' ? true : false,
 					readOnly: scope.readOnly === 'true' ? true : false,
 					tabMode: 'default',
-					/*inputStyle: 'textarea'*/
         };
         scope.syntax = 'javascript';
         var myCodeMirror = CodeMirror.fromTextArea(textarea, codeMirrorConfig);
-
-        // If we have content coming from an ajax call or otherwise, asign it
-        // var unwatch = scope.$watch('container.content', function(oldValue, newValue) {
-				// 	console.info(`scope.watch - ${oldValue} ${newValue}`)
-        //   if(oldValue !== '') {
-        //     myCodeMirror.setValue(oldValue);
-				// 		//myCodeMirror.refresh();
-        //     unwatch();
-        //   }
-        //   else if(oldValue === '' && newValue === '') {
-        //     //unwatch();
-        //   }
-        // });
+				myCodeMirror.getDoc().setValue(scope.content || '');
 
 				scope.container.this = myCodeMirror;
-
 				myCodeMirror.getGutterElement().style['width'] = '59px'; /* 2.071428571 * 23 + 'px';*/
 				myCodeMirror.getGutterElement().style['marginLeft'] = '-5px';
-
 				
 				(function tryRefresh() {
 					myCodeMirror.refresh();
-					// $scope.codemirrorLoaded(myCodeMirror);
-					
 						setTimeout(tryRefresh, 100);
-					/*
-					if (myCodeMirror.display.cachedTextHeight === null)
-						setTimeout(tryRefresh, 100);
-					else {
-						scope.$parent.codemirrorInit();
-					}*/
 				})();
-				// var tryRefresh = (() => {
-				// 	console.info(myCodeMirror.cachedTextHeight);
-				// 	if (typeof myCodeMirror.cachedTextHeight === 'undefined')
-				// 	{
-				// 		console.log('tick');
-				// 		//myCodeMirror.refresh();
-				// 		setTimeout(tryRefresh, 500);
-				// 	}
-					
-				// })();
-//				setTimeout(function() { console.log(myCodeMirror); myCodeMirror.refresh(); }, 1000);
-
-        // Change the mode (syntax) according to dropdown
-        // scope.$watch('syntax', function(oldValue, newValue) {
-        //   myCodeMirror.setOption('mode', scope.syntax);
-        // });
 
 				// word-wrap to codemirror
 				scope.$watch('lineWrapping', function(oldValue, newValue) {
@@ -454,3 +355,48 @@ app.directive('codeMirror', ['$timeout', function($timeout) {
     };
   }
 ]);
+
+/*                */
+/* temporary code */
+/*                */
+app.controller("modalDemo", function($scope, $rootScope) {
+});
+
+app.run(function($rootScope) {
+	document.addEventListener("keyup", function(e) {
+		if (e.keyCode === 27)
+			$rootScope.$broadcast("escapePressed", e.target);
+	});
+					
+					document.addEventListener("click", function(e) {
+							$rootScope.$broadcast("documentClicked", e.target);
+					});
+});
+
+app.directive("menu", function() {
+	return {
+		restrict: "E",
+		template: "<div ng-class='{ show: visible, left: alignment === \"left\", right: alignment === \"right\" }' ng-transclude></div>",
+		transclude: true,
+							scope: {
+									visible: "=",
+									alignment: "@"
+							}
+	};
+});
+			
+app.directive("menuItem", function() {
+			return {
+					restrict: "E",
+					template: "<div ng-click='navigate()' ng-transclude></div>",
+					transclude: true,
+					scope: {
+							hash: "@"
+					},
+					link: function($scope) {
+							$scope.navigate = function() {
+									window.location.hash = $scope.hash;
+							}
+					}
+			}
+});
