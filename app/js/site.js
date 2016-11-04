@@ -216,8 +216,10 @@ app.controller("TestingPageController", function($scope) {
 							continue;
 						}
 
+						j = 0;
+
 						for (let res of data.result.resultList[a].list) {
-							list.push((j++ ? '&nbsp' : i));
+							list.push((j++ ? ' ' : i));
 							list.push(res);
 							if (res.length > k) k = res.length;
 						}
