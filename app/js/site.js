@@ -131,13 +131,19 @@ app.controller("TestingPageController", function($scope) {
 
 	}
 
-	/* not wokring */
 	$scope.codemirrorLoaded = function(_editor){
 		// Events
-		alert('codemirror loaded');
 		_editor.on("beforeChange", function(){ _editor.refresh() });
 		_editor.on("change", function(){ _editor.refresh() });
 	};
+
+	$scope.codemirrorInit = function() {
+		for (let a in $scope.property_value) {
+			if (!$scope.property_value.content) {
+				$scope.property_value[a].this.getDoc().setValue($scope.propertyInput[a]);
+			}
+		}
+	}
 
 	$scope.testForm = function() {
 		var docker_exec = (run, param, stdout, stderr, end) => {
@@ -155,6 +161,9 @@ app.controller("TestingPageController", function($scope) {
 		for (let i in $scope.property_value) {
 			$scope.propertyInput[i] = $scope.property_value[i].content;
 		}
+
+		$scope.outputText.content = '';
+		$scope.jsonResultSet = {};
 
 		const docker_image = $scope.selectedEnv.info.docker_image;
 		const property = JSON.stringify( $scope.propertyInput );
@@ -303,6 +312,7 @@ app.directive('codeMirror', ['$timeout', function($timeout) {
 					lineWrapping: scope.lineWrapping === 'true' ? true : false,
 					readOnly: scope.readOnly === 'true' ? true : false,
 					tabMode: 'default',
+					/*inputStyle: 'textarea'*/
         };
         scope.syntax = 'javascript';
         var myCodeMirror = CodeMirror.fromTextArea(textarea, codeMirrorConfig);
@@ -324,8 +334,13 @@ app.directive('codeMirror', ['$timeout', function($timeout) {
 				myCodeMirror.getGutterElement().style['marginLeft'] = '-5px';
 				(function tryRefresh() {
 					myCodeMirror.refresh();
+					// $scope.codemirrorLoaded(myCodeMirror);
+					
 					if (myCodeMirror.display.cachedTextHeight === null)
 						setTimeout(tryRefresh, 100);
+					else {
+						scope.$parent.codemirrorInit();
+					}
 				})();
 				// var tryRefresh = (() => {
 				// 	console.info(myCodeMirror.cachedTextHeight);
