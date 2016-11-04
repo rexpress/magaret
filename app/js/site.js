@@ -224,25 +224,20 @@ app.controller("TestingPageController", function($scope) {
 					resultSet.columns = data.result.columns;
 
 					for (let a in data.result.resultList) {
-						var list = [];
 						++i;
 						console.log(a);
 
 						if (data.result.resultList[a] === null) {
-							list.push(i);
-							list.push(null);
-							resultSet.list.push(list);
+							resultSet.list.push([i, null]);
 							continue;
 						}
 
 						j = 0;
 
 						for (let res of data.result.resultList[a].list) {
-							list.push((j++ ? ' ' : i));
-							list.push(res);
 							if (res.length > k) k = res.length;
 						}
-						resultSet.list.push(list);
+						resultSet.list.push([(j++ ? ' ' : i), res]);
 					}
 
 					if (!resultSet.columns.length) {
@@ -257,7 +252,7 @@ app.controller("TestingPageController", function($scope) {
 					resultSet.type = 'string';
 					let i = 0;
 					for (res of data.result.resultList) {
-						resultSet.list.push([`${env.testset[i++]}`, `${res}`]);
+						resultSet.list.push([env.testset[i++], res]);
 					}
 					resultSet.columns = ['INPUT', 'RESULT'];
 				}
@@ -266,7 +261,7 @@ app.controller("TestingPageController", function($scope) {
 				{
 					resultSet.type = 'match';
 					for (res of data.result.resultList) {
-						resultSet.list.push([`${env.testset[i++]}`, `${res}`]);
+						resultSet.list.push([env.testset[i++], res]);
 					}
 					resultSet.columns = ['STRING', 'BOOLEAN'];
 				break;
@@ -284,10 +279,8 @@ app.controller("TestingPageController", function($scope) {
 				case 'result':
 					$scope.resultSet = resultGenerate(d.data);
 					$scope.outputText.this.getDoc().setValue(JSON.stringify(d.data));
-					$scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
-
-					if ($scope.resultSet.exception)
-						$scope.notice.err($scope.resultSet.exception, 5000);
+					if (d.data.debugOutput) $scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
+					if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 5000);
 					$scope.$apply();
 				break;
 				case 'log':
@@ -297,176 +290,8 @@ app.controller("TestingPageController", function($scope) {
 				break;
 			}
 		});
-
 	}
 
-	
-	// 	for (let i in $scope.property_value) {
-	// 		$scope.propertyInput[i] = $scope.property_value[i].content;
-	// 	}
-
-	// 	$scope.outputText.content = '';
-	// 	$scope.jsonResultSet = null;
-	// 	$scope.jsonResultSet = {};
-	// 	resultSet = null;
-	// 	resultSet = {};
-	// 	$scope.outputText.this.getDoc().setValue('');
-	// 	$scope.debugText.this.getDoc().setValue('');
-
-	// 	const docker_image = $scope.selectedEnv.info.docker_image;
-	// 	const property = JSON.stringify( $scope.propertyInput );
-	// 	const testSet = JSON.stringify( $scope.inputText.content.split('\n') );
-	// 	const testSetList = $scope.inputText.content.split('\n');
-		
-	// 	var testResult;
-
-	// 	console.info('property and testset');
-	// 	console.info($scope.propertyInput);
-	// 	console.info($scope.inputText.content.split('\n'));
-
-	// 	var buffer = '';
-	// 	docker_exec('docker', ['run', '--rm', '-i', docker_image, property, testSet],
-	// 		(data) => {
-	// 			// on stdout data received
-	// 			var str = buffer + data.toString();
-	// 			var START_RESULT = '##START_RESULT##';
-	// 			var END_RESULT = '##END_RESULT##';
-
-	// 			if (str.substr(START_RESULT) == -1 || str.search(END_RESULT) == -1)
-	// 			{
-	// 				buffer += str;
-	// 				return;
-	// 			}
-
-	// 			if (str.substr(START_RESULT) != -1 && str.search(END_RESULT) != -1) {
-	// 				buffer = '';
-	// 				str = str.substr( str.search(START_RESULT) + START_RESULT.length );
-	// 				str = str.substr( 0, str.search(END_RESULT) );
-
-	// 				console.info(str);
-	// 				testResult = JSON.parse(str);
-	// 				console.log(testResult);
-
-
-	// 				//$scope.inputText.content = 'teest';
-	// 				$scope.outputText.this.getDoc().setValue(JSON.stringify(testResult.result));
-					
-	// 				console.info(testResult.debugOutput);
-	// 				if (typeof testResult.debugOutput !== 'undefined')
-	// 					$scope.debugText.this.getDoc().setValue(testResult.debugOutput.trim());
-
-	// 				resultSet = null;
-	// 				resultSet = {};
-
-	// 				/* group result generate */
-	// 				switch(testResult.type) {
-	// 					case 'GROUP':
-	// 					{
-	// 						resultSet.type = 'group';
-	// 						resultSet.columns = testResult.result.columns;
-
-	// 						resultSet.list = null;
-	// 						resultSet.list = [];
-	// 						let res_num = 0;
-	// 						let case_num = 0;
-	// 						let max_column = 0;
-	// 						for (let r in testResult.result.resultList) {
-	// 							var list = [];
-	// 							++res_num;
-
-	// 							if (testResult.result.resultList[r] === null) {
-	// 								list.push(res_num);
-	// 								list.push(null);
-	// 								resultSet.list.push(list);
-	// 								continue;
-	// 							}
-
-	// 							case_num = 0;
-
-	// 							for (let res of testResult.result.resultList[r].list) {
-	// 								list.push((case_num++ ? '&nbsp' : res_num));
-	// 								list.push(res);
-	// 								if (res.length > max_column) max_column = res.length;
-	// 							}
-
-	// 							resultSet.list.push(list);
-	// 						}
-
-	// 						let alphabet = 65;
-	// 						let max = 0;
-	// 						if (!resultSet.columns.length) {
-
-	// 							resultSet.columns = [];
-	// 							for (let i = 0; i < max_column; i++)
-	// 								resultSet.columns.push(String.fromCharCode(alphabet++));
-	// 						}
-
-	// 					}
-	// 					break;
-	// 					case 'STRING':
-	// 					{
-	// 						resultSet.type = 'string';
-	// 						resultSet.list = null;
-	// 						resultSet.list = [];
-	// 						let res_num = 0;
-	// 						for (res of testResult.result.resultList) {
-	// 							var list = [];
-	// 							list.push(testSetList[res_num++]);
-	// 							list.push(res);
-	// 							resultSet.list.push(list);
-	// 						}
-	// 						resultSet.columns = ['INPUT', 'RESULT'];
-	// 					}
-	// 					break;
-	// 					case 'MATCH':
-	// 					{
-	// 						resultSet.type = 'match';
-	// 						resultSet.list = null;
-	// 						resultSet.list = [];
-	// 						let res_num = 0;
-	// 						for (res of testResult.result.resultList) {
-	// 							var list = [];
-	// 							list.push(testSetList[res_num++]);
-	// 							list.push(res);
-	// 							resultSet.list.push(list);
-	// 						}
-	// 						resultSet.columns = ['STRING', 'BOOLEAN'];
-	// 					break;
-	// 					}
-	// 				}
-	// 				console.info(resultSet);
-
-	// 				$scope.testResultSet = JSON.stringify(testResult.result);
-	// 				$scope.jsonResultSet = testResult.result;
-	// 				$scope.debugOutput = testResult.debugOutput;
-
-	// 				$scope.$apply();
-
-	// 			}
-	// 		},
-	// 		(data) => {
-	// 			// on stderr data received
-	// 			$scope.notice = {
-	// 				'color': 'blue',
-	// 				'text': data.toString()
-	// 			};
-	// 			$scope.$apply();
-
-	// 	  	},
-	// 		(code) => {
-	// 			// on end
-	// 			if (testResult && testResult.exception) {
-	// 				$scope.notice = {
-	// 					'color': 'red',
-	// 					'text': testResult.exception
-	// 				};
-	// 				$scope.$apply();
-
-	// 			}else
-	// 				$scope.notice = null;
-	// 		}
-	// 	);
-	// };
 
 	$scope.resetForm = function() {
 		initPropertyData();
