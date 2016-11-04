@@ -73,7 +73,6 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 
 		// assignment to property value
 		$scope.property_value = {};
-		console.info($scope.property_value);
 		for (let item of env.info.properties) {
 			if (item.type == 'string')
 				$scope.property_value[item.name] = {
@@ -113,25 +112,42 @@ app.controller("TestingPageController", function($scope) {
 
 	$scope.notice = {
 		closeTick: 2000,
+		timestamp: 0,
 		hide: () => {
 			$scope._notice = null;
 			$scope.$apply();
+			$scope.notice.timestamp = 0;
 		},
 		info: (msg,t) => {
 			$scope._notice = {
 				'color': 'blue',
 				'text': msg
 			};
-			setTimeout($scope.notice.hide, (typeof t === 'number' ? t : $scope.notice.closeTick));
+			var tick = $scope.notice.closeTick;
+			$scope.$apply();
+			$scope.notice.timestamp = Date.now() + (t ? t : tick);
 		},
 		err: (msg,t) => {
 			$scope._notice = {
 				'color': 'red',
 				'text': msg
 			};
-			setTimeout($scope.notice.hide, (typeof t === 'number' ? t : $scope.notice.closeTick));
+			var tick = $scope.notice.closeTick;
+			$scope.$apply();
+			$scope.notice.timestamp = Date.now() + (t ? t : tick);
 		}
 	};
+
+	(function watchNotice() {
+		if ($scope.notice.timestamp &&
+				$scope.notice.timestamp < Date.now())
+		{
+			$scope.notice.hide();
+			$scope.$apply();
+		}
+		setTimeout(watchNotice, 1000);
+	})();
+
 	/**
 	 * Init property data
 	 *  fill default value etc..
@@ -193,12 +209,14 @@ app.controller("TestingPageController", function($scope) {
 		let resultGenerate = (data => {
 			var resultSet = {};
 			resultSet.list = [];
+			if (data.exception)
+				resultSet.exception = data.exception;
 			// i = res_num
 			// j = case_num
 			// k = max_column
 			// l = alphabet
 			// m = max
-			let i = 0, j = 0, k = 0, l = 65, m = 0;
+			let i = 0, j = 0, k = 1, l = 65, m = 0;
 			switch(data.type) {
 				case 'GROUP':
 				{
@@ -261,14 +279,25 @@ app.controller("TestingPageController", function($scope) {
 		});
 
 		mg_docker.exec(env.image, env.property, env.testset, d => {
-			$scope.resultSet = resultGenerate(d.data);
-			$scope.outputText.this.getDoc().setValue(JSON.stringify(d.data));
-			$scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
-			$scope.$apply();
+			console.log(d);
+			switch (d.type) {
+				case 'result':
+					$scope.resultSet = resultGenerate(d.data);
+					$scope.outputText.this.getDoc().setValue(JSON.stringify(d.data));
+					$scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
+
+					if ($scope.resultSet.exception)
+						$scope.notice.err($scope.resultSet.exception, 5000);
+					$scope.$apply();
+				break;
+				case 'log':
+					$scope.notice.info(d.data, 5000);
+				break;
+				case 'end':
+				break;
+			}
 		});
 
-		// test notice;;
-		$scope.notice.info('테스트입니다');
 	}
 
 	
@@ -520,7 +549,6 @@ app.directive('codeMirror', ['$timeout', function($timeout) {
 				content: '@',
       },
       link: function(scope, element, attrs) {
-		console.log(scope.$root);
         var textarea = element.find('textarea')[0];
         var showLineNumbers = scope.lineNumbers === 'true' ? true : false;
         var codeMirrorConfig = {

@@ -22,10 +22,10 @@
         }
       });
       ls.stderr.on('data', data => {
-        return { type: 'stderr', data: data };
+        return callback({ type: 'log', data: `${data}` });
       });
       ls.on('close', data => {
-        return { type: 'end', data: data };
+        return callback({ type: 'end', data: `${data}` });
       });
     },
     clearBuffer: () => {

@@ -15,31 +15,24 @@ app.factory('CacheLib', function () {
 		'read': function(key) {
 			try {
 				var content = jsonfile.readFileSync( getFilePath(key) );
-				return content;
+				
+				// cache livetime is one days
+				if (content.timestamp + 1000 * 60 * 60 * 24 < Date.now() || Object.keys(content.data).length === 0) {
+					console.warn('Cache expired');
+					return null;
+				}
+				return content.data;
 
 			}catch(error) {
 				return null
 			}
 		},
 		'write': function(key, value) {
-			jsonfile.writeFileSync(getFilePath(key), value);
+			jsonfile.writeFileSync(getFilePath(key), { timestamp: Date.now(), data: value });
 		}
 	}
 
 });
-
-function getEnvironments() {
-	const request = require('request');
-	const httpContext = {
-		'headers': {
-			'User-Agent': 'regular.express Client'
-		}
-	}
-	request.get('http://regular.express/environments.json', httpContext,
-		(err, res, body) => {
-
-	});
-}
 
 app.factory('Environments', function() {
 	return {
@@ -56,53 +49,11 @@ app.factory('Environments', function() {
 			var queue = [];
 			var envInfo = {}
 
-			request.get('https://api.github.com/repos/rexpress/environments/git/trees/master?recursive=1', httpContext,
+			request.get('http://regular.express/environments.json', httpContext,
 				(err, res, body) => {
 					const data = JSON.parse(body);
-
-					for (var i of data.tree) {
-						const tmp = i.path.split('/');
-						if (tmp.length != 2) continue;
-						
-						const envGroupName = tmp[0];
-						const envChildName = tmp[1].split('.json')[0];
-
-						var target;
-						if (envChildName == '_info') {
-							envInfo[ envGroupName ] = target = {
-								'name': envGroupName,
-								'children': []
-							}
-						}else {
-							target = {'name': envChildName}
-							envInfo[ envGroupName ].children.push(target);
-						}
-						queue.push({
-							'path': envGroupName + '/' + envChildName + '.json',
-							'target': target
-						});
-					}
-
-					async.eachSeries(queue,
-						function iteratee(item, callback) {
-							const request = require('request');
-							const path = item.path;
-
-							console.log('GET ' + item.path);
-							request.get(`https://github.com/rexpress/environments/raw/master/${path}`, httpContext,
-								(err, res, body) => {
-									item.target.info = JSON.parse(body);
-									callback(null);
-								}
-							);
-						},
-						function() {
-							console.log('Loading env is finished complete');
-							console.log(envInfo);
-
-							onCompleteCallback(envInfo);
-						}
-					);
+					console.log('Loading env is finished complete');
+					onCompleteCallback(data);
 				}
 			);
 		}
