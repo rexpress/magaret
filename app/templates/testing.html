@@ -1,4 +1,4 @@
-<pre ng-show="notice" class="notice {{ notice.color }}">{{ notice.text }}</pre>
+<pre ng-show="_notice" class="notice {{ _notice.color }}">{{ _notice.text }}</pre>
 
 <div class="container">
 	<div class="header">
@@ -91,9 +91,9 @@
 						<td class="line-number"><div>{{ $index + 1 }}</div></td>
 						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
 						
-						<td class="group-data bool-false" ng-show="result[1] == false"><div>{{ result[0] }}</div></td>
-						<td class="group-data bool-false" ng-show="result[1] == false"><div>{{ result[1] }}</div></td>
-						<td class="space bool-false" ng-show="result[1] == false"><div>&nbsp;</div></td>
+						<td class="group-data bool-false"><div>{{ result[0] }}</div></td>
+						<td class="group-data bool-false"><div>{{ result[1] }}</div></td>
+						<td class="space bool-false"><div>&nbsp;</div></td>
 						
 						<td class="group-data bool-true" ng-show="result[1] == true"><div>{{ result[0] }}</div></td>
 						<td class="group-data bool-true" ng-show="result[1] == true"><div>{{ result[1] }}</div></td>
