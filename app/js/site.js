@@ -198,7 +198,6 @@ app.controller("TestingPageController", function($scope) {
 
 				if (str.substr(START_RESULT) == -1 || str.search(END_RESULT) == -1)
 				{
-					console.log('없음');
 					buffer += str;
 					return;
 				}
@@ -304,6 +303,10 @@ app.controller("TestingPageController", function($scope) {
 					$scope.testResultSet = JSON.stringify(testResult.result);
 					$scope.jsonResultSet = testResult.result;
 					$scope.debugOutput = testResult.debugOutput;
+
+					for (let cd of $scope.property_value) {
+						cd.this.refresh();
+					}
 					$scope.$apply();
 
 				}
