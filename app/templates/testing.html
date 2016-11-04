@@ -16,42 +16,80 @@
 			<button ng-click="resetForm()">Reset</button>
 		</section>
 	</div>
-	<table id="properties">
-		<input type="hidden" value="extractor" data-name="test_type">
+	<section id="property">
+		<title>properties</title>
+		<content>
+			<!--<table>
+				<tr ng-repeat="property in selectedEnv.info.properties">
+					<td class="key">{{ property.name }}
+					</td>
+					<td class="value">{{ property.example }}
+					</td>
+				</tr>
+			</table>-->
+			<table id="properties">
+				<input type="hidden" value="extractor" data-name="test_type">
 
-		<tr ng-repeat="property in selectedEnv.info.properties" ng-show="property.type != 'hidden'">
-			<th>
-				<span ng:class="property.required && 'required'">{{ property.name }}</span>
-				<a class="help" title="{{ property.help }}">?</a>
-			</th>
-			<td>
-				<div ng-switch on="property.type">
-					<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>
-					<input  ng-switch-when="number"  type="number"   ng-model="propertyInput[property.name]">
-					<input  ng-switch-when="boolean" type="checkbox" ng-model="propertyInput[property.name]"></textarea>
-					<select ng-switch-when="list" ng-model="propertyInput[property.name]" ng-option="property.list"></select>
-				</div>
+				<tr ng-repeat="property in selectedEnv.info.properties" ng-show="property.type != 'hidden'">
+					<th>
+						<span ng:class="property.required && 'required'" title="{{ property.name }}">{{ property.name }}</span>
+						<a class="help" data-tooltip-text="{{ property.help }}">?</a>
+					</th>
+					<td>
+						<div ng-switch on="property.type">
+							
+							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" container="property_value[property.name]" theme='tomorrow-night-eighties' line-numbers="false"></code-mirror>
 
-				<pre ng-show="property.type == 'string' || property.type == 'number'" class="example">example: {{ property.example }}</pre>
-			</td>
-		</tr>
-	</table>
+							<!--<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>-->
+							<input  ng-switch-when="number"  type="number"   ng-model="propertyInput[property.name]">
+							<input  ng-switch-when="boolean" type="checkbox" ng-model="propertyInput[property.name]"></textarea>
+							<select ng-switch-when="list" ng-model="propertyInput[property.name]" ng-option="property.list"></select>
+						</div>
 
-	<h3>Test Set</h3>
-	<section id="test-set">
-		<textarea ng-model="testSetInput"></textarea>
+						<pre ng-show="property.type == 'string' || property.type == 'number'" class="example">example: {{ property.example }}</pre>
+					</td>
+				</tr>
+			</table>
+		</content>
 	</section>
-
-	<h3>Result Set</h3>
-	<section id="result-set">
-		<textarea disabled="disabled" ng-model="testResultSet"></textarea>
+	<section id="input">
+		<title>input</title>
+		<content>
+			<code-mirror container="inputText" theme='tomorrow-night-eighties' line-numbers="true"></code-mirror>
+		</content>
 	</section>
-
-	<h3>Debug Output</h3>
-	<section id="debug-output">
-		<textarea disabled="disabled" ng-model="debugOutput"></textarea>
+	<section id="result">
+		<title>result</title>
+		<content>
+			<table id="result-table">
+				<tr>
+					<th>&nbsp;</th>
+					<th class="result-column" ng-repeat="columns in jsonResultSet.columns">
+						{{ columns }}
+					</th>
+				</tr>
+				<tr ng-repeat="resultSet in jsonResultSet.resultList track by $index" ng-rowspan="resultList.list.length" ng-show="!(jsonResultSet.resultList.length == 1 && jsonResultSet.resultList[0] == null)">
+						<td>
+							{{ $index + 1 }}
+						</td>
+						<td ng-repeat="res in resultSet.list[0] track by $index">
+						{{ res }}
+						</td>
+				</tr>
+			</table>
+		</content>
 	</section>
-
-
+	<section id="output">
+		<title>output</title>
+		<content>
+			<code-mirror container="outputText" theme='tomorrow-night-eighties' line-numbers="true"></code-mirror>
+		</content>
+	</section>
+	<section id="debug">
+		<title>debug</title>
+		<content>
+			<code-mirror container="debugText" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
+		</content>
+	</section>
 	<div id="foot-area"></div>
 </div>

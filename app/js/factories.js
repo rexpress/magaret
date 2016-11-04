@@ -28,6 +28,18 @@ app.factory('CacheLib', function () {
 
 });
 
+function getEnvironments() {
+	const request = require('request');
+	const httpContext = {
+		'headers': {
+			'User-Agent': 'regular.express Client'
+		}
+	}
+	request.get('http://regular.express/environments.json', httpContext,
+		(err, res, body) => {
+
+	});
+}
 
 app.factory('Environments', function() {
 	return {

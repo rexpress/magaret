@@ -9,13 +9,20 @@ testing-page .notice{
 testing-page .notice.red { background-color: lightcoral }
 testing-page .notice.blue { background-color: #25a3f1}
 
-
-
-testing-page .container{
-	padding: 15px;
-	height: 100%;
+testing-page .container,
+testing-page section#input, testing-page section#output, testing-page section#debug {
+	background: #eee;
 }
 
+testing-page .header {
+	padding: 15px 20px 0px;
+	border-bottom: 1px solid #ddd;
+	background: white;
+}
+
+testing-page .body {
+	padding: 15px;
+}
 
 testing-page h3 {
 	margin: 20px 0 7px;
@@ -42,7 +49,8 @@ testing-page section.info h2 {
 	margin: 0;
 	padding: 0;
 	font-size: 1.5rem;
-	font-weight: 200;
+	font-weight: 600;
+	color: #123765;
 }
 
 testing-page section.info .details {
@@ -53,8 +61,32 @@ testing-page section.buttons {
 	display: initial;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #9a9a9a;
+  border: 0px none #ffffff;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b5b5b5;
+}
+::-webkit-scrollbar-thumb:active {
+  background: #777777;
+}
+::-webkit-scrollbar-track {
+  background: white;
+  border: 0px none transparent;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 testing-page section.buttons button {
-	background-color: #00af86; /* Green */
+	background-color: #123765; /* Green */
 	border: none;
 	color: white;
 	padding: 8px 20px;
@@ -66,11 +98,11 @@ testing-page section.buttons button {
 	outline: none;
 }
 testing-page section.buttons button:hover {
-	background-color: #00ca9b;
+	background-color: #1b4982;
 	box-shadow: none;
 }
 testing-page section.buttons button:active {
-	background-color: #009270;
+	background-color: #0d2748;
 }
 
 
@@ -87,9 +119,55 @@ testing-page section > textarea{
 	font-size: .8em;
 }
 
+testing-page section title {
+	margin: 15px 0 0px 18px;
+	color: #555;
+	font-size: 26px;
+	font-weight: 300;
+	border-bottom: 0;
+	display: block;
+}
+
+testing-page content {
+	background: white;
+	display: block;
+}
+
+testing-page #property table {
+	width: 100%;
+	border: none;
+	outline: none;
+}
+
+testing-page #property td.key {
+	width: 100px;
+	text-align: right;
+	margin-right: 15px;
+	padding: 2px 15px 2px 2px;
+}
+
+testing-page #property td.value {
+	width: 100%;
+}
+
+testing-page #properties td {
+	padding: 4px 10px 4px 10px !important;
+}
+
+testing-page #property .CodeMirror {
+	background: transparent;
+	border-bottom: 1px solid #aaa;
+	padding: 0px;
+}
+
+testing-page #property .CodeMirror pre {
+	/*padding: 0px;*/
+}
 
 testing-page #properties {
 	border-collapse: collapse;
+	table-layout: fixed;
+	overflow-x: none;
 	width: 100%;
 }
 
@@ -107,7 +185,18 @@ testing-page #properties td {
 testing-page #properties th {
 	text-align: right;
 	vertical-align: top;
-	border-right: 2px solid #d0d0d0;
+	border-right: 2px solid #11b9b9;
+	width: 150px;
+}
+
+testing-page #properties th span {
+  display: inline-block;
+	text-overflow: ellipsis;
+	width: calc(100% - 25px);
+	overflow: hidden;
+	/* margin-right: 100px; */
+	white-space: nowrap;
+	float: left;
 }
 
 testing-page #properties th span:before {
@@ -123,7 +212,7 @@ testing-page #properties th span.required:before {
 
 testing-page #properties th a.help {
 	display: inline-block;
-	margin-left: 0.5rem;
+	margin-left: 0.2rem;
 	width: 1rem;
 	height: 1rem;
 	text-align: center;
@@ -146,6 +235,58 @@ testing-page #properties textarea {
 	height: 1rem;
 }
 
+testing-page #result-table th {
+	background: #00af86;
+	color: white;
+	width: 80px;
+}
+
+testing-page #result-table td {
+	border: 1px solid #aaa;
+}
+
+testing-page [data-tooltip-text]:hover {
+	position: relative;
+	cursor: help;
+}
+
+testing-page [data-tooltip-text]:after {
+	-webkit-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+	-moz-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+	transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+
+	background-color: rgba(0, 0, 0, 0.8);
+
+  -webkit-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+	-moz-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+	box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+	
+  -webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	
+  color: #FFFFFF;
+	font-size: 12px;
+	margin-bottom: 10px;
+	padding: 7px 12px;
+	position: absolute;
+	min-width: 200px;
+	word-wrap: break-word;
+
+	z-index: 9999;
+
+	opacity: 0;
+	left: -9999px;
+  top: 90%;
+	
+	content: attr(data-tooltip-text);
+}
+
+testing-page [data-tooltip-text]:hover:after {
+	top: 130%;
+	left: 0;
+	opacity: 1;
+}
 
 #foot-area {
 	margin-top: 20px;

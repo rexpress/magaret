@@ -5,11 +5,11 @@
 }
 
 #tester-view aside {
-	width: 300px;
+	width: 255px;
 	height: 100%;
-	background: aliceblue;
+	background: white;
 	float: left;
-	height: calc(100% - 66px);
+	height: calc(100% - 62px);
 	overflow: auto;
 }
 
@@ -47,20 +47,37 @@ nav#lnb .item {
 }
 
 
-nav#lnb .item.parent-item { background: #f1eaa1}
-nav#lnb .item.child-item { background: white }
-nav#lnb .item.child-item .title{ padding-left: 32px !important}
+nav#lnb .item.parent-item {
+	background: #123765;
+	color: white;
+	pointer-events: none;
+}
+nav#lnb .item.child-item {
+	background: white;
+	cursor: pointer;	
+}
+nav#lnb .item.child-item .title{
+	padding-left: 32px !important;
+}
 
 nav#lnb .item.selected {
-	background: #00af86;
+	background: #0a9bff !important;
 	color: white !important;
 }
 
+nav#lnb .item:hover {
+    background: #eee;
+}
 
+[class^=devicon-] {
+	margin-right: 4px;
+}
 
 /* Main content (Test Area) */
 
 #tester-view #main {
-	overflow: auto;
-	height: calc(100% - 70px);
+	overflow-x: hidden;
+	overflow-y: auto;
+	height: calc(100% - 62px);
+	background: #eee;
 }

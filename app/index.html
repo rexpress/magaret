@@ -3,9 +3,44 @@
 <head>
 	<meta charset="utf-8">
 	<title>regular.express tester</title>
-	
-	<!--<base href="{{__dirname}}">-->
+	<link rel="stylesheet/less" type="text/css" href="styles.less" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js"></script>
 
+	<!-- codemirror -->
+	<link rel="stylesheet" href="http://esironal.github.io/cmtouch/lib/codemirror.css">
+	<link rel="stylesheet" href="http://esironal.github.io/cmtouch/addon/hint/show-hint.css">
+	<script src="http://esironal.github.io/cmtouch/lib/codemirror.js"></script>
+	<script src="http://esironal.github.io/cmtouch/addon/hint/show-hint.js"></script>
+	<script src="http://esironal.github.io/cmtouch/addon/hint/xml-hint.js"></script>
+	<script src="http://esironal.github.io/cmtouch/addon/hint/html-hint.js"></script>
+	<script src="http://esironal.github.io/cmtouch/mode/xml/xml.js"></script>
+	<script src="http://esironal.github.io/cmtouch/mode/javascript/javascript.js"></script>
+	<script src="http://esironal.github.io/cmtouch/mode/css/css.js"></script>
+	<script src="http://esironal.github.io/cmtouch/mode/htmlmixed/htmlmixed.js"></script>
+	<script src="http://esironal.github.io/cmtouch/addon/selection/active-line.js"></script>
+	<script src="http://esironal.github.io/cmtouch/addon/edit/matchbrackets.js"></script>
+	<link rel="stylesheet" href="http://esironal.github.io/cmtouch/theme/neonsyntax.css">
+	<style type="text/css">
+		.CodeMirror {
+			line-height: 1.5;
+			font-size: 15px;
+			width: 100%;
+			height: 100%;
+		}
+		.CodeMirror-gutters {
+			width: 100px;
+			border-right: 2px solid #11b9b9;
+		}
+		
+		.CodeMirror-linenumber.CodeMirror-gutter-elt {
+    width: 40px !important;
+    text-align: right;
+	</style>
+
+
+
+	<!--<base href="{{__dirname}}">-->
+	
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&amp;subset=latin">
 	<link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/master/devicon.min.css">
 
@@ -24,18 +59,39 @@
 </head>
 <body>
 	<header>
-		<div id="logo">
+		<div id="logo" class="fl">
 			<a href="#">
 				<div id="logo-content"></div>
 			</a>
 		</div>
+		<ul id="gnb" class="fl clearfix">
+			<li>
+				<a href="index.html#/" ng:class="currentRoute.name == 'tester' && 'selected'" title="TEST REGEX">TEST REGEX</a>
+			</li>
+			<li>
+				<a href="index.html#/history" ng:class="currentRoute.name == 'history' && 'selected'" title="HISTORY">HISTORY</a>
+			</li>
+			<li>
+				<a href="javascript:void(0)" ng-click="openBrowser('http://regular.express')">OFFICIAL PAGE</a>
+			</li>
+		</ul>
+		<div id="propic" class="fr">
+			<a href="javascript:void(0)" ng-click="showRight($event)">LOGIN</a>
+		</div>
+		<!--
 		<nav id="gnb">
 			<a href="index.html#/" class="nav-item" ng:class="currentRoute.name == 'tester' && 'nav-select'" title="Test Regex">Test Regex</a>
 			<a href="index.html#/history" class="nav-item" ng:class="currentRoute.name == 'history' && 'nav-select'" title="History">History</a>
 			<a ng-click="openBrowser('http://regular.express')" class="nav-item" title="WebPage">Official Website</a>
 		</nav>
+		//-->
 	</header>
 
+	<menu visible="rightVisible" alignment="right">
+		<menu-item hash="first-page">First Page</menu-item>
+		<menu-item hash="second-page">Second Page</menu-item>
+		<menu-item hash="third-page">Third Page</menu-item>
+	</menu>
 	<section id="content" ng-view></section>
 </body>
 </html>
