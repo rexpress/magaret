@@ -156,6 +156,7 @@ app.controller("TestingPageController", function($scope) {
 		$scope.debugOutput = null;
 		$scope._notice = null;
 		$scope.resultSet = null;
+		$scope.result = null;
 
 		$scope.inputText.this.getDoc().setValue(''); //err?
 		$scope.outputText.this.getDoc().setValue('');

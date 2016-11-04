@@ -91,13 +91,13 @@
 						<td class="line-number"><div>{{ $index + 1 }}</div></td>
 						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null"><div>Null</div></td>
 						
-						<td class="group-data bool-false"><div>{{ result[0] }}</div></td>
-						<td class="group-data bool-false"><div>{{ result[1] }}</div></td>
-						<td class="space bool-false"><div>&nbsp;</div></td>
+						<td class="group-data bool-false" ng-show="result[1] == 'false'"><div>{{ result[0] }}</div></td>
+						<td class="group-data bool-false" ng-show="result[1] == 'false'"><div>{{ result[1] }}</div></td>
+						<td class="space bool-false" ng-show="result[1] == 'false'"><div>&nbsp;</div></td>
 						
-						<td class="group-data bool-true" ng-show="result[1] == true"><div>{{ result[0] }}</div></td>
-						<td class="group-data bool-true" ng-show="result[1] == true"><div>{{ result[1] }}</div></td>
-						<td class="space bool-true" ng-show="result[1] == true"><div>&nbsp;</div></td>
+						<td class="group-data bool-true" ng-show="result[1] == 'true'"><div>{{ result[0] }}</div></td>
+						<td class="group-data bool-true" ng-show="result[1] == 'true'"><div>{{ result[1] }}</div></td>
+						<td class="space bool-true" ng-show="result[1] == 'true'"><div>&nbsp;</div></td>
 
 						<td class="group-data" ng-show="resultSet.type == 'string'"><div>{{ result[0] }}</div></td>
 						<td class="group-data" ng-show="resultSet.type == 'string'"><div><pre>{{ result[1] }}</pre></div></td>
