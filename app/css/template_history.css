@@ -1,0 +1,66 @@
+@charset "utf-8";
+
+panel > section {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  width: 310px;
+  height: 100%;
+  box-sizing: border-box;
+  float: right;
+}
+
+panel > .right {
+  right: -310px;
+}
+
+.history {
+  width: 310px;
+  height: calc(100% - 4.6rem);
+  display: block;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.history-box {
+	border-bottom: 1px solid #aaa;
+	width: 280px;
+	padding: 13px 13px 30px;
+	background-color: white;
+	font-size: 14px;
+}
+
+.history-box:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+.history-box .properties {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /*margin-top: 16px;*/
+  font-size: 13px;
+}
+
+.history-box .properties span {
+  border-bottom: 1px solid #ccc;
+  padding: 2px 3px;
+}
+
+.history-box .properties span.key {
+  display: inline-block;
+  width: 80px;
+  color: #444;
+  margin-right: 4px;
+}
+
+.history-box .last {
+  padding-top: 3px;
+}
+
+.history-box .created {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}

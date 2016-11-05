@@ -16,6 +16,7 @@ app.config(function ($routeProvider) {
 
 
 app.run(function ($rootScope) {
+	$rootScope.historyPanel = false;
 	$rootScope.rightVisible = false;
 
 	$rootScope.$on('$routeChangeStart', function (event, next) {
@@ -27,12 +28,17 @@ app.run(function ($rootScope) {
 	};
 
 
+	$rootScope.showHistory = (e) => {
+		$rootScope.historyPanel = true;
+	}
+
 	$rootScope.showRight = (e) => {
 		$rootScope.rightVisible = true;
 		e.stopPropagation();
 	}
 
 	$rootScope.close = () => {
+		$rootScope.historyPanel = false;
 		$rootScope.rightVisible = false;
 	}
 
@@ -168,7 +174,9 @@ app.controller("TestingPageController", function ($scope) {
 		$scope.debugText.this.setValue('');
 
 		for (let p in $scope.propertyString) {
-			$scope.propertyString[p].this.setValue('');
+			try {
+				$scope.propertyString[p].this.setValue('');
+			} catch (e) { }
 		}
 	}
 
@@ -383,6 +391,18 @@ app.directive("menu", function () {
 	return {
 		restrict: "E",
 		template: "<div ng-class='{ show: visible, left: alignment === \"left\", right: alignment === \"right\" }' ng-transclude></div>",
+		transclude: true,
+		scope: {
+			visible: "=",
+			alignment: "@"
+		}
+	};
+});
+
+app.directive("panel", function () {
+	return {
+		restrict: "E",
+		templateUrl: './views/history.html', /* temp */
 		transclude: true,
 		scope: {
 			visible: "=",

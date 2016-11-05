@@ -46,6 +46,7 @@
 
 	<link rel="stylesheet" href="css/view_tester.css">
 	<link rel="stylesheet" href="css/template_testing.css">
+	<link rel="stylesheet" href="css/template_history.css">
 
 
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
@@ -59,7 +60,7 @@
 <body>
 	<header>
 		<div id="logo" class="fl">
-			<a href="#">
+			<a href="index.html#/">
 				<div id="logo-content"></div>
 			</a>
 		</div>
@@ -69,6 +70,7 @@
 			</li>
 			<li>
 				<a href="index.html#/history" ng:class="currentRoute.name == 'history' && 'selected'" title="HISTORY">HISTORY</a>
+				<!--<a href="javascript:void(0)" title="HISTORY" ng-click="showHistory($event)">HISTORY</a>-->
 			</li>
 			<li>
 				<a href="javascript:void(0)" ng-click="openBrowser('http://regular.express')">OFFICIAL PAGE</a>
@@ -85,6 +87,9 @@
 		</nav>
 		//-->
 	</header>
+
+	<panel visible="historyPanel" alignment="right">
+	</panel>
 
 	<menu visible="rightVisible" alignment="right">
 		<menu-item hash="first-page">First Page</menu-item>

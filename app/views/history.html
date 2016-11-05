@@ -1,1 +1,35 @@
-<p>Under Construction</p>
+<!-- pseudo design -->
+<section class="history" ng-class='{ show: visible, left: alignment === "left", right: alignment === "right" }'>
+  <div class="history-box" ng-repeat="n in [1, 2, 3, 4, 5] track by $index">
+    <content>
+      <ul class="properties">
+        <li>
+          <span class="key">Environment</span>
+          <span class="value">Flume</span>
+        </li>
+        <li>
+          <span class="key">input.regex</span>
+          <span class="value">(0[0-9]{2})-([0-9]{3,4})-([0-...</span>
+        </li>
+        <li>
+          <span class="key">columns</span>
+          <span class="value">A,B,C</span>
+        </li>
+        <li>
+          <span class="key">columns.t...</span>
+          <span class="value">STRING,STRING,STRING</span>
+        </li>
+        <li>
+          <span class="key">input.reg...</span>
+          <span class="value">False</span>
+        </li>
+      </ul>
+      <div class="last clearfix">
+
+        <div class="created fr">
+          2016-10-24 18:09:59
+        </div>
+      </div>
+    </content>
+  </div>
+</section>
