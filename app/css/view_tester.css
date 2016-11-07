@@ -48,8 +48,8 @@ nav#lnb .item {
 
 
 nav#lnb .item.parent-item {
-	background: #123765;
-	color: white;
+	background: #eee;
+	color: black;
 	pointer-events: none;
 }
 nav#lnb .item.child-item {
@@ -66,7 +66,7 @@ nav#lnb .item.selected {
 }
 
 nav#lnb .item:hover {
-    background: #eee;
+    background: #c1d6e6;
 }
 
 [class^=devicon-] {
