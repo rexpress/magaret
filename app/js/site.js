@@ -67,6 +67,7 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 		Environments.load(function (result) {
 			$scope.envInfo = result;
 			CacheLib.write('envInfo', result);
+			$scope.$apply();
 		});
 	}
 
