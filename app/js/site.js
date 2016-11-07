@@ -30,6 +30,7 @@ app.run(function ($rootScope) {
 
 	$rootScope.showHistory = (e) => {
 		$rootScope.historyPanel = true;
+		e.stopPropagation();
 	}
 
 	$rootScope.showRight = (e) => {
@@ -44,6 +45,8 @@ app.run(function ($rootScope) {
 
 	$rootScope.$on("documentClicked", _close);
 	$rootScope.$on("escapePressed", _close);
+
+	$rootScope.env = "env1234";
 
 	function _close() {
 		$rootScope.$apply(() => {
@@ -408,7 +411,25 @@ app.directive("panel", function () {
 		scope: {
 			visible: "=",
 			alignment: "@"
-		}
+		},
+		controller: ["$scope", "$rootScope", function($scope, $rootScope) {
+					console.log($rootScope.blah);
+					console.log($scope.yah);
+
+					$scope.content = [{
+						env: 'flume',
+						properties: {
+							'regex': 'regex',
+							'test1': 'test1',
+							'test2': 'test2'
+						},
+						date: Date.now()
+					}]
+
+					$scope.test = function(arg) {
+							console.log(arg);
+					}
+			}]
 	};
 });
 

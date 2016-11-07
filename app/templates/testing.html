@@ -29,7 +29,6 @@
 			</table>-->
 			<table id="properties">
 				<input type="hidden" value="extractor" data-name="test_type">
-
 				<tr ng-repeat="property in selectedEnv.info.properties" ng-show="property.type != 'hidden'">
 					<th>
 						<span ng:class="property.required && 'required'" title="{{ property.name }}">{{ property.name }}</span>

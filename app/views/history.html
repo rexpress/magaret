@@ -1,14 +1,14 @@
 <!-- pseudo design -->
 <section class="history" ng-class='{ show: visible, left: alignment === "left", right: alignment === "right" }'>
-  <div class="history-box" ng-repeat="n in [1, 2, 3, 4, 5] track by $index">
+  <div class="history-box" ng-repeat="item in content track by $index" ng-click="test('asdf')">
     <content>
       <ul class="properties">
         <li>
           <span class="key">Environment</span>
-          <span class="value">Flume</span>
+          <span class="value">{{ item.env }}</span>
         </li>
         <li>
-          <span class="key">input.regex</span>
+          <span class="key">{{ item.property.name }}</span>
           <span class="value">(0[0-9]{2})-([0-9]{3,4})-([0-...</span>
         </li>
         <li>

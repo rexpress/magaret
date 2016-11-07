@@ -17,7 +17,7 @@ app.factory('CacheLib', function () {
 				var content = jsonfile.readFileSync( getFilePath(key) );
 				
 				// cache livetime is one days
-				if (content.timestamp + 1000 * 60 * 60 * 24 < Date.now() || Object.keys(content.data).length === 0) {
+				if (content.timestamp + 1000 < Date.now() || Object.keys(content.data).length === 0) {
 					console.warn('Cache expired');
 					return null;
 				}

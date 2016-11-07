@@ -77,9 +77,9 @@ testing-page section.buttons {
   background: #777777;
 }
 ::-webkit-scrollbar-track {
-  background: white;
-  border: 0px none transparent;
-  border-radius: 0px;
+	background: #e0e0e0;
+	border: 0px none transparent;
+	border-radius: 0px;
 }
 ::-webkit-scrollbar-corner {
   background: transparent;
@@ -323,8 +323,9 @@ table.result-table {
 }
 .result-table tr td.group-data > div {
 	min-width: 90px;
-	text-align: center;
+	text-align: left;
 	padding: 4px 25px;
+	white-space: pre;
 }
 
 .result-table tr:nth-of-type(2n+1) > * {

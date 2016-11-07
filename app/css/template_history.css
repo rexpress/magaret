@@ -14,12 +14,19 @@ panel > .right {
   right: -310px;
 }
 
+panel > .show {
+  right: 0px;
+  top: 62px;
+      z-index: 3;
+}
+
 .history {
   width: 310px;
-  height: calc(100% - 4.6rem);
+  height: calc(100% - 62px);
   display: block;
   overflow-x: hidden;
   overflow-y: scroll;
+  background: white;
 }
 
 .history-box {
