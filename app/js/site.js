@@ -289,14 +289,14 @@ app.controller("TestingPageController", function ($scope, HistoryLib) {
 			}
 			return resultSet;
 		});
-
+/*
 		console.info(env);
 		var history = HistoryLib.read();
 		if (!history) history = [{}];
 		else history = history.data;
 
 		history = history.push(env);
-
+*/
 		mg_docker.exec(env.image, env.property, env.testset, d => {
 			switch (d.type) {
 				case 'result':
