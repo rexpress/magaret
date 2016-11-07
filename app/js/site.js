@@ -46,8 +46,6 @@ app.run(function ($rootScope) {
 	$rootScope.$on("documentClicked", _close);
 	$rootScope.$on("escapePressed", _close);
 
-	$rootScope.env = "env1234";
-
 	function _close() {
 		$rootScope.$apply(() => {
 			$rootScope.close();
@@ -57,7 +55,7 @@ app.run(function ($rootScope) {
 
 
 
-app.controller("TesterController", function ($scope, Environments, CacheLib) {
+app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib) {
 	var envInfo = CacheLib.read('envInfo');
 
 	$scope.content = '';
@@ -75,7 +73,10 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 	}
 
 	$scope.selectedEnv = null;
-	$scope.loadEnv = function (env) {
+
+	var loadEnv = function (env) {
+		console.log('loadEnv');
+		console.log(env);
 		$scope.selectedEnv = env;
 
 		// initialize resultSet object
@@ -90,6 +91,15 @@ app.controller("TesterController", function ($scope, Environments, CacheLib) {
 				};
 		}
 	};
+
+	$scope.loadEnv = loadEnv;
+
+	$scope.$watch('test', function (oldValue, newValue) {
+		if (!newValue) return;
+		var env = oldValue;
+		console.log(loadEnv);
+	});
+
 
 	for (let init of ['inputText', 'outputText', 'debugText']) {
 		$scope[init] = {
@@ -107,7 +117,7 @@ app.controller("HistoryController", function ($scope, $rootScope) {
 
 
 
-app.controller("TestingPageController", function ($scope) {
+app.controller("TestingPageController", function ($scope, HistoryLib) {
 	// On selected Env is changed
 	$scope.$watch('selectedEnv', initPropertyData);
 
@@ -280,6 +290,13 @@ app.controller("TestingPageController", function ($scope) {
 			return resultSet;
 		});
 
+		console.info(env);
+		var history = HistoryLib.read();
+		if (!history) history = [{}];
+		else history = history.data;
+
+		history = history.push(env);
+
 		mg_docker.exec(env.image, env.property, env.testset, d => {
 			switch (d.type) {
 				case 'result':
@@ -416,13 +433,18 @@ app.directive("panel", function () {
 					console.log($rootScope.blah);
 					console.log($scope.yah);
 
+					$scope.loadEnv = env => {
+						console.info(env);
+						$rootScope.test = env;
+					}
+
 					$scope.content = [{
 						env: 'flume',
-						properties: {
-							'regex': 'regex',
-							'test1': 'test1',
-							'test2': 'test2'
-						},
+						properties: [{
+							'name': 'regex',
+							'type': 'value',
+							'value': '1234'
+						}],
 						date: Date.now()
 					}]
 
