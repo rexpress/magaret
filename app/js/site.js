@@ -112,7 +112,7 @@ app.controller("TestingPageController", function ($scope) {
 	$scope.$watch('selectedEnv', initPropertyData);
 
 	$scope.notice = {
-		closeTick: 2000,
+		closeTick: 5000,
 		timestamp: 0,
 		hide: () => {
 			$scope._notice = null;
@@ -279,18 +279,18 @@ app.controller("TestingPageController", function ($scope) {
 			}
 			return resultSet;
 		});
-		
+
 		mg_docker.exec(env.image, env.property, env.testset, d => {
 			switch (d.type) {
 				case 'result':
 					$scope.resultSet = resultGenerate(d.data);
 					$scope.outputText.this.getDoc().setValue(JSON.stringify(d.data));
 					if (d.data.debugOutput) $scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
-					if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 5000);
+					if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 15000);
 					$scope.$apply();
 					break;
 				case 'log':
-					$scope.notice.info(d.data, 5000);
+					$scope.notice.info(d.data, 8000);
 					break;
 				case 'end':
 					break;
