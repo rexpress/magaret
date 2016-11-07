@@ -8,6 +8,9 @@
       const spawn = require('child_process').spawn;
       var property = JSON.stringify(property);
       var testset = JSON.stringify(testset);
+
+      console.info(`execute >> ${image} ${property} ${testset}`)
+
       let ls = spawn('docker', ['run', '--rm', '-i', `${image}`, `${property}`, `${testset}`], {
         detached: true,
         windowsVerbatimArguments: true

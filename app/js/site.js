@@ -279,7 +279,7 @@ app.controller("TestingPageController", function ($scope) {
 			}
 			return resultSet;
 		});
-
+		
 		mg_docker.exec(env.image, env.property, env.testset, d => {
 			switch (d.type) {
 				case 'result':

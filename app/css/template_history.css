@@ -26,19 +26,18 @@ panel > .show {
   display: block;
   overflow-x: hidden;
   overflow-y: scroll;
-  background: white;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .history-box {
 	border-bottom: 1px solid #aaa;
 	width: 280px;
 	padding: 13px 13px 30px;
-	background-color: white;
 	font-size: 14px;
 }
 
 .history-box:hover {
-  background: #eee;
+  background: rgb(238, 238, 238, 0.85);
   cursor: pointer;
 }
 
