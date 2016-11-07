@@ -12,7 +12,7 @@
 							<i ng-switch-when="devicon" class="devicon-{{ envGroup.info.icon.value }}-plain"></i>
 							<img ng-switch-when="image" ng-src="{{ envGroup.info.icon.value }}">
 						</span>
-						<span class="title">{{ envGroup.name }}</span>
+						<span class="title">{{ envGroup.info.title }}</span>
 					</div>
 					<ul class="sub-list">
 						<li ng-repeat="envChild in envGroup.children">
