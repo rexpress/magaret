@@ -1,0 +1,14 @@
+<section class="share-box" ng-class='{ show: visible }'>
+    <content ng-click="ignoreEvent($event)">
+        <form>
+            <h2 class="title">Share This Expression</h2>
+            <h3>Title</h3>
+            <textarea ng-model="title"></textarea>
+            <h3>Description</h3>
+            <textarea ng-model="description"></textarea>
+            <div class="buttons">
+                <button ng-click="submitForm($event)">Share</button>
+            </div>
+        </form>
+    </content>
+</section>

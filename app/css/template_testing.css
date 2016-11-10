@@ -59,6 +59,20 @@ testing-page section.info .details {
 
 testing-page section.buttons {
 	display: initial;
+	float: right;
+}
+
+testing-page section.buttons .share {
+	border-right: 5px solid #eee;
+	background-color: #0a9bff;
+}
+
+testing-page section.buttons .share:hover{
+	background-color: #45b3ff
+}
+
+testing-page section.buttons .share:active{
+	background-color: #017fd6;
 }
 
 ::-webkit-scrollbar {
@@ -394,4 +408,72 @@ table.result-table {
 .disable-btn button {
 	background: #aaa !important;
 	pointer-events: none;
+}
+
+.share-box {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: rgba(123, 123, 123, 0.6);
+	z-index: 999;
+	display: none;
+}
+
+.share-box.show {
+	display: block;
+}
+
+.share-box content {
+	display: block;
+    position: relative;
+    width: 420px;
+    color: white;
+	top: calc(50% - 170px);
+	margin: auto;
+    z-index: 100;
+}
+
+.share-box form {
+	background: #252526;
+    box-shadow: 0 2px 8px #000;
+    padding: 1em;
+    width: 420px;
+}
+
+.share-box h2 {
+    margin: 0;
+    padding: 0;
+    font-weight: 300;
+    font-size: 1.8em;
+}
+
+.share-box h3 {
+    font-weight: 300;
+    font-size: 1.2em;
+    margin-bottom: 0.3em;
+}
+
+.share-box textarea {
+    width: 98.6%;
+    resize: none;
+    height: 2.5em;
+}
+
+.share-box button {
+    background-color: #123765;
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    outline: none;
+}
+
+.share-box .buttons {
+	margin-top: 20px;
+	text-align: center;
 }

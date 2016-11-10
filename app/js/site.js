@@ -18,6 +18,7 @@ app.config(function ($routeProvider) {
 app.run(function ($rootScope) {
 	$rootScope.historyPanel = false;
 	$rootScope.rightVisible = false;
+	$rootScope.shareBoxVisible = false;
 
 	$rootScope.$on('$routeChangeStart', function (event, next) {
 		$rootScope.currentRoute = next;
@@ -33,14 +34,77 @@ app.run(function ($rootScope) {
 		e.stopPropagation();
 	}
 
+	$rootScope.actLogin = (e) => {
+		const {BrowserWindow} = require('electron').remote;
+		let win = new BrowserWindow({width: 800, height: 600})
+		win.on('closed', () => {
+			win = null;
+		});
+
+		// remove menu bar
+		win.setMenu(null);
+
+		win.authCheck = (url) => {
+			if (url.search('auth.regular.express')) {
+				let query = require('querystring')
+				.parse(require('url')
+				.parse('http://auth.regular.express/?code=54632fc2cadd8f9b6136').query);
+
+				// https://developer.github.com/v3/oauth/
+				if (query.error) {
+					let error = query.error;
+					let error_description = query.error_description;
+					let error_url = query.error_url;
+
+					win.close();
+					alert(`인증 실패: ${error}`);
+					win = null;
+				}
+				else
+				{
+					let code = query.code;
+					win.close();
+					alert(`인증에 성공했습니다: ${code}`);
+					win = null;
+				}
+			}
+		}
+
+		win.webContents.on('did-fail-load', function(e, errorCode, errorDescription, validatedURL, isMainFrame) {
+			if (win) win.authCheck(validatedURL);
+		});
+
+		win.webContents.on('did-get-redirect-request', function(e, oldURL, newURL, isMainFrame, httpResponseCode, requestMethod, refeerrer, header) {
+			if (win) win.authCheck(newURL);
+		});
+	
+
+		// Or load a local HTML file
+		win.loadURL(`https://github.com/login/oauth/authorize?client_id=16756a3f11cc61c1bc5d`)
+	}
+
+	$rootScope.actLogout = (e) => {
+		const {BrowserWindow} = require('electron').remote;
+		let win = new BrowserWindow({width: 800, height: 600})
+		win.on('closed', () => {
+			win = null;
+		});
+	}
+
 	$rootScope.showRight = (e) => {
 		$rootScope.rightVisible = true;
+		e.stopPropagation();
+	}
+
+	$rootScope.showShareBox = (e) => {
+		$rootScope.shareBoxVisible = true;
 		e.stopPropagation();
 	}
 
 	$rootScope.close = () => {
 		$rootScope.historyPanel = false;
 		$rootScope.rightVisible = false;
+		$rootScope.shareBoxVisible = false;
 	}
 
 	$rootScope.$on("documentClicked", _close);
@@ -204,6 +268,10 @@ app.controller("TestingPageController", function ($scope, HistoryLib) {
 		for (let a in $scope.propertyString) {
 			$scope.propertyString[a].content = $scope.propertyInput[a];
 		}
+	}
+
+	$scope.shareForm = function () {
+		$scope.shareBox = true;
 	}
 
 	$scope.testForm = function () {
@@ -455,6 +523,27 @@ app.directive("panel", function () {
 	};
 });
 
+app.directive("sharebox", function ($rootScope) {
+	return {
+		restrict: "E",
+		templateUrl: './templates/shareBox.html', /* temp */
+		transclude: true,
+		scope: {
+			visible: "=",
+		},
+		link: function ($scope) {
+			$scope.ignoreEvent = function (e) {
+				e.stopPropagation();
+			},
+			$scope.submitForm = function (e) {
+				console.info(`${$scope.title} / ${$scope.description}`);
+				$scope.title = '';
+				$scope.description = '';
+				$rootScope.shareBoxVisible = false;
+			}
+		}
+	};
+});
 app.directive("menuItem", function () {
 	return {
 		restrict: "E",
