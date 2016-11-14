@@ -76,7 +76,7 @@
 							<div>{{ result[0] }}</div>
 						</td>
 						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null">
-							<div>Null</div>
+							<div>Unmatched</div>
 						</td>
 						<td ng-repeat="item in result[1] track by $index" class="group-data" ng-show="result[1] != null">
 							<div>{{ item }}</div>
