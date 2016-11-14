@@ -22,6 +22,38 @@ app.factory('HistoryLib', function () {
 	}
 });
 
+app.factory('GitHubToken', function () {
+	const jsonfile = require('jsonfile');
+	const fs = require('fs');
+
+	const base = './cache/';
+
+	if (!fs.existsSync(base))
+		fs.mkdir(base);
+
+	function getFilePath() {
+		return base + 'appkey.json';
+	}
+	return {
+		'save': function(value) {
+			jsonfile.writeFileSync(getFilePath(), { data: value });
+		},
+		'load': function() {
+			try {
+				var content = jsonfile.readFileSync( getFilePath() );
+				return content.data;
+
+			}catch(error) {
+				return null
+			}
+		},
+		'reset': function() {
+			jsonfile.writeFileSync(getFilePath(), { data: null });
+			return null;
+		}
+	}
+})
+
 app.factory('CacheLib', function () {
 	const jsonfile = require('jsonfile');
 	const fs = require('fs');
@@ -75,13 +107,40 @@ app.factory('Environments', function() {
 				let i, len = keys.length, k;
 
 				var newObj = {};
-				console.info(keys);
 				keys.sort();
 				for (i = 0; i < len; i++) {
 					k = keys[i];
 					newObj[k] = obj[k];
 				}
 				return newObj;
+			}
+
+			String.prototype.replaceAll = function(search, replacement) {
+				var target = this;
+				return target.split(search).join(replacement);
+			};
+
+			var clearName = (obj) => {
+				console.warn(obj);
+				for (let a in obj) {
+					let parent = obj[a].info.title.split(' ');
+					parent = parent[parent.length - 1];
+					for (let c in obj[a].children) {
+						let name = obj[a].children[c].name;
+						name = name.replaceAll(parent.toLowerCase(), parent);
+						name = name.replaceAll('-', ' ');
+						var name_sp = name.split(' ');
+						name = '';
+						for (let n in name_sp) {
+							if (n > 0 && name_sp[n][0] >= 'a' && name_sp[n][0] <= 'z')
+								name_sp[n] = name_sp[n][0].toUpperCase() + name_sp[n].substr(1);
+							name += name_sp[n] + ' ';
+						}
+						obj[a].children[c].displayName = name;
+					}
+					//console.info(obj[a]);
+				}
+				return obj;
 			}
 
 			var queue = [];
@@ -91,7 +150,7 @@ app.factory('Environments', function() {
 				(err, res, body) => {
 					var data;
 					try {
-						data = sortJSON(JSON.parse(body));
+						data = clearName(sortJSON(JSON.parse(body)));
 					}
 					catch (e) {
 						console.warn(`Loading Env Failed : ${e.message}`);

@@ -14,7 +14,7 @@
 		<section class="buttons">
 			<button ng-click="testForm()">Test</button>
 			<button ng-click="resetForm()">Reset</button>
-			<button class="share" ng-click="showShareBox($event)">Share</button>
+			<button class="share" ng-show="!!outputText.content && !!resultSet.type" ng-click="showShareBox($event)">Share</button>
 		</section>
 	</div>
 	<section id="property">
@@ -38,7 +38,7 @@
 					<td>
 						<div ng-switch on="property.type">
 
-							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" content="{{ property.example }}" container="propertyString[property.name]"
+							<code-mirror ng-switch-when="string" ng-model="propertyInput[property.name]" content="{{ property.content }}" container="propertyString[property.name]"
 								theme='tomorrow-night-eighties' line-numbers="false"></code-mirror>
 
 							<!--<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>-->

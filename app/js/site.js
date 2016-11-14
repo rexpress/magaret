@@ -1,4 +1,5 @@
 var app = angular.module('app', ['ngRoute']);
+const {BrowserWindow, ipcMain} = require('electron').remote;
 
 app.config(function ($routeProvider) {
 	$routeProvider
@@ -15,10 +16,11 @@ app.config(function ($routeProvider) {
 });
 
 
-app.run(function ($rootScope) {
+app.run(function ($rootScope, GitHubToken) {
 	$rootScope.historyPanel = false;
 	$rootScope.rightVisible = false;
 	$rootScope.shareBoxVisible = false;
+	$rootScope.scopeObj = null;
 
 	$rootScope.$on('$routeChangeStart', function (event, next) {
 		$rootScope.currentRoute = next;
@@ -34,61 +36,44 @@ app.run(function ($rootScope) {
 		e.stopPropagation();
 	}
 
+
+	var ghToken = GitHubToken.load();
+	$rootScope.ghToken = ghToken;
+
+
+	var init = false;
+	ipcMain.on('auth-result', (event, arg) => {
+		var obj = JSON.parse(arg);
+
+		if (obj.access_token) {
+			GitHubToken.save(obj.access_token);
+			$rootScope.ghToken = obj.access_token;
+			$rootScope.$apply();
+			alert('Authorization Successful.');
+		}
+		else {
+			alert('Auth Failed : ' + obj.error);
+		}
+	});
+	
 	$rootScope.actLogin = (e) => {
-		const {BrowserWindow} = require('electron').remote;
-		let win = new BrowserWindow({width: 800, height: 600})
+		var win = new BrowserWindow({width: 800, height: 600, webPreferences: {
+			preload: require('path').join(__dirname, 'js/authPreload.js'),
+			partition: 'auth'
+		}})
 		win.on('closed', () => {
 			win = null;
 		});
-
-		// remove menu bar
+		
 		win.setMenu(null);
-
-		win.authCheck = (url) => {
-			if (url.search('auth.regular.express')) {
-				let query = require('querystring')
-				.parse(require('url')
-				.parse('http://auth.regular.express/?code=54632fc2cadd8f9b6136').query);
-
-				// https://developer.github.com/v3/oauth/
-				if (query.error) {
-					let error = query.error;
-					let error_description = query.error_description;
-					let error_url = query.error_url;
-
-					win.close();
-					alert(`인증 실패: ${error}`);
-					win = null;
-				}
-				else
-				{
-					let code = query.code;
-					win.close();
-					alert(`인증에 성공했습니다: ${code}`);
-					win = null;
-				}
-			}
-		}
-
-		win.webContents.on('did-fail-load', function(e, errorCode, errorDescription, validatedURL, isMainFrame) {
-			if (win) win.authCheck(validatedURL);
-		});
-
-		win.webContents.on('did-get-redirect-request', function(e, oldURL, newURL, isMainFrame, httpResponseCode, requestMethod, refeerrer, header) {
-			if (win) win.authCheck(newURL);
-		});
-	
-
-		// Or load a local HTML file
 		win.loadURL(`https://github.com/login/oauth/authorize?client_id=16756a3f11cc61c1bc5d`)
 	}
 
 	$rootScope.actLogout = (e) => {
-		const {BrowserWindow} = require('electron').remote;
-		let win = new BrowserWindow({width: 800, height: 600})
-		win.on('closed', () => {
-			win = null;
-		});
+		GitHubToken.reset();
+		alert('Logout Account');
+		$rootScope.ghToken = null;
+		$rootScope.$apply();
 	}
 
 	$rootScope.showRight = (e) => {
@@ -119,8 +104,10 @@ app.run(function ($rootScope) {
 
 
 
-app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib) {
+app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib, GitHubToken) {
 	var envInfo = CacheLib.read('envInfo');
+	
+	$rootScope.scopeObj = $scope;
 
 	$scope.content = '';
 
@@ -140,28 +127,50 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 
 	$scope.selectedEnv = null;
 
+	// initialize resultSet object
+	$scope.resultSet = {};
+
 	var loadEnv = function (env) {
+
 		console.log('loadEnv');
 		console.log(env);
 
-		if (!$scope.selectedEnv) {
-			/*$scope.inputText.this.setValue('');
-			$scope.outputText.this.setValue('');
-			$scope.debugText.this.setValue('');
+		if ($scope.selectedEnv) {
+			$scope.selectedEnv.save.inputText = $scope.inputText.this.getValue();
+			$scope.selectedEnv.save.outputText = $scope.outputText.this.getValue();
+			$scope.selectedEnv.save.debugText = $scope.debugText.this.getValue();
 
-			for (let p in $scope.propertyString) {
+			// save to resultSet
+			$scope.selectedEnv.save.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
+
+			// process to property string
+			for (var p in $scope.propertyString) {
 				try {
-					$scope.propertyString[p].this.setValue('');
+					$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
 				} catch (e) { }
-			}*/
+			}
+
+			for (let p in $scope.propertyInput) {
+				try {
+					$scope.selectedEnv.save.property[p] = JSON.parse(JSON.stringify($scope.propertyInput[p]));
+				} catch (e) { }
+			}
+		}
+
+
+		if (env == $scope.selectedEnv)
+			return false;
+
+		if (env.save == undefined) {
+			env.save = {};
+			env.save.property = {};
 		}
 
 		$scope.selectedEnv = env;
 
-		// initialize resultSet object
-		$scope.resultSet = {};
 
 		// assignment to property value
+		$scope.propertyInput = {};
 		$scope.propertyString = {};
 		for (let item of env.info.properties) {
 			if (item.type == 'string')
@@ -196,7 +205,7 @@ app.controller("HistoryController", function ($scope, $rootScope) {
 
 
 
-app.controller("TestingPageController", function ($scope, HistoryLib) {
+app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib) {
 	// On selected Env is changed
 	$scope.$watch('selectedEnv', initPropertyData);
 
@@ -244,31 +253,51 @@ app.controller("TestingPageController", function ($scope, HistoryLib) {
 	function initPropertyData() {
 		if (!$scope.selectedEnv) return;
 
-		propertyInput = {};
 		for (var prop of $scope.selectedEnv.info.properties) {
+			for (let p in $scope.selectedEnv.info.properties) {
+					if ($scope.selectedEnv.info.properties[p].name == prop.name) {
+						$scope.selectedEnv.info.properties[p].content = $scope.selectedEnv.info.properties[p].example;
+						if ($scope.selectedEnv.save.property[prop.name])
+							$scope.selectedEnv.info.properties[p].content = $scope.selectedEnv.save.property[prop.name];
+					}
+			}
+
 			if (prop.value)
-				propertyInput[prop.name] = prop.value;
+				$scope.propertyInput[prop.name] = prop.value;
 			else if (prop.default !== undefined)
-				propertyInput[prop.name] = prop.default;
+				$scope.propertyInput[prop.name] = prop.default;
 			else // example placeholder
-				propertyInput[prop.name] = prop.example;
+				$scope.propertyInput[prop.name] = prop.example;
 		}
 
-		$scope.propertyInput = propertyInput;
+		if ($scope.selectedEnv.save.inputText)
+			$scope.inputText.this.setValue($scope.selectedEnv.save.inputText);
+		else
+			$scope.inputText.this.setValue('');
+		if ($scope.selectedEnv.save.outputText)
+			$scope.outputText.this.setValue($scope.selectedEnv.save.outputText);
+		else
+			$scope.outputText.this.setValue('');
+		if ($scope.selectedEnv.save.debugText)
+			$scope.debugText.this.setValue($scope.selectedEnv.save.debugText);
+		else
+			$scope.debugText.this.setValue('');
+		
+		if ($scope.selectedEnv.save.resultSet)
+			$scope.resultSet = $scope.selectedEnv.save.resultSet;
+		else
+			$scope.resultSet = null;
+
 		$scope.testSetInput = "";
 		$scope.jsonResultSet = null;
 		$scope.testResultSet = null;
 		$scope.debugOutput = null;
 		$scope._notice = null;
-		$scope.resultSet = null;
 		$scope.result = null;
-		$scope.inputText.this.setValue('');
-		$scope.outputText.this.setValue('');
-		$scope.debugText.this.setValue('');
 
 		for (let p in $scope.propertyString) {
 			try {
-				$scope.propertyString[p].this.setValue('');
+					$scope.propertyString[p].this.setValue('');
 			} catch (e) { }
 		}
 	}
@@ -291,7 +320,7 @@ app.controller("TestingPageController", function ($scope, HistoryLib) {
 
 	$scope.testForm = function () {
 		for (var p in $scope.propertyString) {
-			$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();;
+			$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
 		}
 
 		let env = (() => {
@@ -384,10 +413,22 @@ app.controller("TestingPageController", function ($scope, HistoryLib) {
 			switch (d.type) {
 				case 'result':
 					$scope.resultSet = resultGenerate(d.data);
+					console.info($scope.resultSet);
+					$rootScope.scopeObj.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
 					$scope.outputText.this.getDoc().setValue(JSON.stringify(d.data));
 					if (d.data.debugOutput) $scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
 					if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 15000);
 					$scope.$apply();
+
+					// history
+					$scope.loadEnv($scope.selectedEnv);
+					console.info($scope.selectedEnv);
+
+					var history = HistoryLib.read();
+					if (!history) history = [{}];
+					else history = history.data;
+
+					history = history.push(env);
 					break;
 				case 'log':
 					$scope.notice.info(d.data, 8000);
@@ -513,8 +554,8 @@ app.directive("panel", function () {
 			alignment: "@"
 		},
 		controller: ["$scope", "$rootScope", function($scope, $rootScope) {
-					console.log($rootScope.blah);
-					console.log($scope.yah);
+					//console.log($rootScope.blah);
+					//console.log($scope.yah);
 
 					$scope.loadEnv = env => {
 						console.info(env);
@@ -550,11 +591,82 @@ app.directive("sharebox", function ($rootScope) {
 			$scope.ignoreEvent = function (e) {
 				e.stopPropagation();
 			},
+			$scope.ignoreKeyEvent = function (e) {
+				if (e.keyCode == 13) {
+					e.stopPropagation();
+					e.preventDefault();
+				}
+			}
 			$scope.submitForm = function (e) {
-				console.info(`${$scope.title} / ${$scope.description}`);
+				if (!$rootScope.ghToken) {
+					alert('Require Login');
+					return false;
+				}
+				for (var p in $rootScope.scopeObj.propertyString) {
+					$rootScope.scopeObj.propertyInput[p] = $rootScope.scopeObj.propertyString[p].this.getValue();
+				}
+
+				let env = (() => {
+					return {
+						property: $rootScope.scopeObj.propertyInput,
+					}
+				})();
+
+				var obj = {
+					'access_token': $rootScope.ghToken,
+					'login_type': 'github',
+					'data': {
+						'title': $scope.title,
+						'description': $scope.description,
+						'env': [ ],
+						'tags': [ ],
+						'properties': { },
+						'input': [ ],
+						'output': { },
+					}
+				}
+
+				for (let p in $rootScope.scopeObj.propertyInput) {
+					try {
+						obj.data.properties[p] = JSON.parse(JSON.stringify($rootScope.scopeObj.propertyInput[p]));
+					} catch (e) { }
+				}
+
+				obj.data.input = $rootScope.scopeObj.inputText.this.getValue().split('\n');
+				obj.data.output = JSON.parse($rootScope.scopeObj.outputText.this.getValue());
+				
 				$scope.title = '';
 				$scope.description = '';
 				$rootScope.shareBoxVisible = false;
+
+				const httpContext = {
+					'headers': {
+						'User-Agent': 'regular.express Client'
+					}
+				};
+
+				const request = require('request');
+				request({
+					url: 'http://auth.regular.express/share',
+					method: 'POST',
+					json: true,
+					headers: {
+						"content-type": "application/json",		
+					},
+					body: JSON.stringify(obj)
+				},
+				(err, res, body) => {
+					var data;
+					try {
+						data = JSON.parse(body);
+					}
+					catch (e) {
+						console.warn(`SHARING FAILED : ${e.message}`);
+					}
+					console.log('SHARE COMPLETED');
+				});
+
+				
 			}
 		}
 	};

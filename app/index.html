@@ -77,8 +77,8 @@
 			</li>
 		</ul>
 		<div id="propic" class="fr">
-			<a href="javascript:void(0)" ng-click="actLogin($event)">LOGIN</a>
-			<!--<a href="javascript:void(0)" ng-click="showHistory($event)">HISTORY</a>-->
+			<a href="javascript:void(0)" ng-show="ghToken == null" ng-click="actLogin($event)">LOGIN</a>
+			<a href="javascript:void(0)" ng-show="ghToken != null" ng-click="actLogout($event)">LOGOUT</a>
 		</div>
 		<!--
 		<nav id="gnb">

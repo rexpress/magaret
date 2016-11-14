@@ -459,6 +459,18 @@ table.result-table {
     width: 98.6%;
     resize: none;
     height: 2.5em;
+    font-size: 1em;
+		border: 0px;
+		padding: 5px;
+}
+
+.share-box input {
+		width: 98.6%;
+		height: 1em;
+		font-size: 1em;
+		border: 0px;
+		padding: 5px;
+		outline: 0px;
 }
 
 .share-box button {
