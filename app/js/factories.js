@@ -2,22 +2,26 @@ app.factory('HistoryLib', function () {
 	const jsonfile = require('jsonfile');
 	const fs = require('fs');
 
-	const base = './history';
+	const base = './history/';
 	const histfile = 'history.json';
 
 	if (!fs.existsSync(base))
 		fs.mkdir(base);
 
 	function getFilePath(key) {
-		return base + encodeURI(key);
+		return base + histfile;
 	}
 
 	return {
 		read: function() {
-			return jsonfile.readFileSync( base + encodeURI('histfile').data );
+			try {
+				return jsonfile.readFileSync( getFilePath() ).data;
+			} catch (e) {
+				return null;
+			}
 		},
 		write: function() {
-			jsonfile.writeFileSync(getFilePath(key), { timestamp: Date.now(), data: value });
+			jsonfile.writeFileSync(getFilePath(), { timestamp: Date.now(), data: value });
 		}
 	}
 });

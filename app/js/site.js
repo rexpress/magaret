@@ -43,6 +43,8 @@ app.run(function ($rootScope, GitHubToken) {
 
 	var init = false;
 	ipcMain.on('auth-result', (event, arg) => {
+		console.log(arg);
+		
 		var obj = JSON.parse(arg);
 
 		if (obj.access_token) {
@@ -635,6 +637,8 @@ app.directive("sharebox", function ($rootScope) {
 				obj.data.input = $rootScope.scopeObj.inputText.this.getValue().split('\n');
 				obj.data.output = JSON.parse($rootScope.scopeObj.outputText.this.getValue());
 				
+				obj.data.env = [$rootScope.scopeObj.selectedEnv.parent.name, $rootScope.scopeObj.selectedEnv.name]
+
 				$scope.title = '';
 				$scope.description = '';
 				$rootScope.shareBoxVisible = false;
@@ -645,19 +649,25 @@ app.directive("sharebox", function ($rootScope) {
 					}
 				};
 
+				console.info(obj);
+
 				const request = require('request');
 				request({
-					url: 'http://auth.regular.express/share',
+					//url: 'http://auth.regular.express/share',
+					url: 'http://lab.prev.kr:7777/share',
 					method: 'POST',
 					json: true,
 					headers: {
-						"content-type": "application/json",		
+						"Content-Type": "application/json",
 					},
 					body: JSON.stringify(obj)
 				},
 				(err, res, body) => {
 					var data;
 					try {
+						console.log(err);
+						console.log(res);
+						console.log(body);
 						data = JSON.parse(body);
 					}
 					catch (e) {
