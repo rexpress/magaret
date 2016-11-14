@@ -673,7 +673,7 @@ app.directive("sharebox", function ($rootScope) {
 					catch (e) {
 						console.warn(`SHARING FAILED : ${e.message}`);
 					}
-					console.log('SHARE COMPLETED');
+					console.info('SHARE COMPLETED : ' + data.url);
 				});
 
 				
