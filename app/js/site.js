@@ -653,8 +653,8 @@ app.directive("sharebox", function ($rootScope) {
 
 				const request = require('request');
 				request({
-					//url: 'http://auth.regular.express/share',
-					url: 'http://lab.prev.kr:7777/share',
+					url: 'http://auth.regular.express/share',
+					//url: 'http://lab.prev.kr:7777/share',
 					method: 'POST',
 					json: true,
 					headers: {
