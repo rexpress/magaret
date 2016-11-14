@@ -70,12 +70,32 @@ app.factory('Environments', function() {
 				}
 			};
 
+			var sortJSON = (obj) => {
+				let keys = Object.keys(obj);
+				let i, len = keys.length, k;
+
+				var newObj = {};
+				console.info(keys);
+				keys.sort();
+				for (i = 0; i < len; i++) {
+					k = keys[i];
+					newObj[k] = obj[k];
+				}
+				return newObj;
+			}
+
 			var queue = [];
 			var envInfo = {}
 
 			request.get('http://regular.express/environments.json', httpContext,
 				(err, res, body) => {
-					const data = JSON.parse(body);
+					var data;
+					try {
+						data = sortJSON(JSON.parse(body));
+					}
+					catch (e) {
+						console.warn(`Loading Env Failed : ${e.message}`);
+					}
 					console.log('Loading env is finished complete');
 					onCompleteCallback(data);
 				}

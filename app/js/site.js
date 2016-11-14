@@ -133,6 +133,8 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 			$scope.envInfo = result;
 			CacheLib.write('envInfo', result);
 			$scope.$apply();
+
+			console.info($scope.envInfo);
 		});
 	}
 
@@ -141,6 +143,19 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 	var loadEnv = function (env) {
 		console.log('loadEnv');
 		console.log(env);
+
+		if (!$scope.selectedEnv) {
+			/*$scope.inputText.this.setValue('');
+			$scope.outputText.this.setValue('');
+			$scope.debugText.this.setValue('');
+
+			for (let p in $scope.propertyString) {
+				try {
+					$scope.propertyString[p].this.setValue('');
+				} catch (e) { }
+			}*/
+		}
+
 		$scope.selectedEnv = env;
 
 		// initialize resultSet object
