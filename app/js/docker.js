@@ -8,8 +8,11 @@
       const spawn = require('child_process').spawn;
       var property = JSON.stringify(property);
       var testset = JSON.stringify(testset);
+      console.info(`execute >> ${image} ${property} ${testset}`);
 
-      console.info(`execute >> ${image} ${property} ${testset}`)
+      property = new Buffer(property).toString("base64");
+      testset = new Buffer(testset).toString("base64");
+      console.info(`encoded >> ${image} ${property} ${testset}`);
 
       let ls = spawn('docker', ['run', '--rm', '-i', `${image}`, `${property}`, `${testset}`], {
         detached: true,
