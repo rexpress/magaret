@@ -656,7 +656,6 @@ app.directive("sharebox", function ($rootScope) {
 					url: 'http://auth.regular.express/share',
 					//url: 'http://lab.prev.kr:7777/share',
 					method: 'POST',
-					json: true,
 					headers: {
 						"Content-Type": "application/json",
 					},
@@ -665,10 +664,11 @@ app.directive("sharebox", function ($rootScope) {
 				(err, res, body) => {
 					var data;
 					try {
-						console.log(err);
-						console.log(res);
-						console.log(body);
-						data = JSON.parse(body);
+						if (res.statusCode == 200) {
+							data = JSON.parse(body);
+							//window.open(data.url);
+						}
+						else alert(`Share Failed : ${e.message}`);
 					}
 					catch (e) {
 						console.warn(`SHARING FAILED : ${e.message}`);
