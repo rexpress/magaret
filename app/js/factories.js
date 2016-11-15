@@ -150,13 +150,14 @@ app.factory('Environments', function() {
 			var queue = [];
 			var envInfo = {}
 
-			request.get('http://regular.express/environments.json', httpContext,
+			request.get('http://rexpress.github.io/environments.json', httpContext,
 				(err, res, body) => {
 					var data;
 					try {
 						data = clearName(sortJSON(JSON.parse(body)));
 					}
 					catch (e) {
+						console.log(body);
 						console.warn(`Loading Env Failed : ${e.message}`);
 					}
 					console.log('Loading env is finished complete');
