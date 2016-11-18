@@ -3,7 +3,6 @@
 <div class="container">
 	<div class="header">
 		<section class="info">
-			{{  }}
 			<h2>{{ selectedEnv.info.title }}</h2>
 			<span class="description">{{ selectedEnv.info.description }}</span>
 			<span class="details">
@@ -13,9 +12,9 @@
 			</span>
 		</section>
 		<section class="buttons">
-			<button ng-show="!selectedEnv.image[0]" ng-click="testForm()">Test</button>
-			<button ng-show="selectedEnv.image[0] == 1" ng-click="testForm()">Install</button>
-			<button ng-show="selectedEnv.image[0] == 2" ng-click="updateForm()">Update</button>
+			<button ng-show="selectedEnv._image || !selectedEnv.image[0]" ng-click="testForm()">Test</button>
+			<button ng-show="!selectedEnv._image && selectedEnv.image[0] == 1" ng-click="updateForm()">Install</button>
+			<button ng-show="!selectedEnv._image && selectedEnv.image[0] == 2" ng-click="updateForm()">Update</button>
 			<button ng-click="resetForm()">Reset</button>
 			<button class="share" ng-show="!!outputText.content && !!resultSet.type" ng-click="showShareBox($event)">Share</button>
 		</section>

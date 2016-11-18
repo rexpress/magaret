@@ -387,13 +387,13 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 			},
 			function (callback) {
 				testImage(env.image, (result) => {
-					$rootScope.imageInfo[env.image][0] = 0;
+					$scope.selectedEnv.image[0] = 0;
 					if (!result[1])
-						$rootScope.imageInfo[env.image][0] = 1;
+						$scope.selectedEnv.image[0] = 1;
 					else if (result[0] != result[1])
-						$rootScope.imageInfo[env.image][0] = 2;
+						$scope.selectedEnv.image[0] = 2;
 					
-					if (!$rootScope.imageInfo[env.image][0]) {
+					if (!$scope.selectedEnv.image[0]) {
 						$scope.$apply();
 						callback(null);
 					}
