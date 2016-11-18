@@ -127,8 +127,8 @@ function testImage(image, tag, cb) {
 }
 
 //getRepoManifest('regexpress/java', '1.8');
-getImageInspect('aregexpress/java', '1.8', (e, d) => {
+/*getImageInspect('aregexpress/java', '1.8', (e, d) => {
   console.log(d);
-});
+});*/
 //testImage('regexpress/java','1.8');
 //testImage('regexpress/python:3');

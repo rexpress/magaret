@@ -393,8 +393,10 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 					else if (result[0] != result[1])
 						$rootScope.imageInfo[env.image][0] = 2;
 					
-					if (!$rootScope.imageInfo[env.image][0])
+					if (!$rootScope.imageInfo[env.image][0]) {
+						$scope.$apply();
 						callback(null);
+					}
 				});
 			},
 			function (callback) {
