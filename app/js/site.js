@@ -40,32 +40,27 @@ app.run(function ($rootScope, GitHubToken) {
 	var ghToken = GitHubToken.load();
 	$rootScope.ghToken = ghToken;
 
-
-	var init = false;
-	ipcMain.on('auth-result', (event, arg) => {
-		console.log(arg);
-		
-		var obj = JSON.parse(arg);
-
-		if (obj.access_token) {
-			GitHubToken.save(obj.access_token);
-			$rootScope.ghToken = obj.access_token;
-			$rootScope.$apply();
-			alert('Authorization Successful.');
-		}
-		else {
-			alert('Auth Failed : ' + obj.error);
-		}
-	});
-	
 	$rootScope.actLogin = (e) => {
-		var win = new BrowserWindow({width: 800, height: 600, webPreferences: {
-			preload: require('path').join(__dirname, 'js/authPreload.js'),
-			partition: 'auth'
-		}})
-		win.on('closed', () => {
-			win = null;
+		var once = false;
+		ipcMain.once('auth-result', (event, arg) => {
+			if (once) return false;
+			var obj = JSON.parse(arg);
+
+			if (obj.access_token) {
+				GitHubToken.save(obj.access_token);
+				$rootScope.ghToken = obj.access_token;
+				$rootScope.$apply();
+				alert('Authorization Successful.');
+			}
+			else {
+				alert('Auth Failed : ' + obj.error);
+			}
+			once = true;
 		});
+		let win = new BrowserWindow({width: 800, height: 600, webPreferences: {
+			preload: require('path').join(__dirname, 'js/authPreload.js'),
+			partition: 'auth' + Date.now().toString()
+		}})
 		
 		win.setMenu(null);
 		win.loadURL(`https://github.com/login/oauth/authorize?client_id=16756a3f11cc61c1bc5d`)
@@ -84,6 +79,10 @@ app.run(function ($rootScope, GitHubToken) {
 	}
 
 	$rootScope.showShareBox = (e) => {
+		if (!$rootScope.ghToken) {
+			alert('Require Login');
+			return false;
+		}
 		$rootScope.shareBoxVisible = true;
 		e.stopPropagation();
 	}
@@ -91,7 +90,6 @@ app.run(function ($rootScope, GitHubToken) {
 	$rootScope.close = () => {
 		$rootScope.historyPanel = false;
 		$rootScope.rightVisible = false;
-		$rootScope.shareBoxVisible = false;
 	}
 
 	$rootScope.$on("documentClicked", _close);
@@ -108,7 +106,7 @@ app.run(function ($rootScope, GitHubToken) {
 
 app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib, GitHubToken) {
 	var envInfo = CacheLib.read('envInfo');
-	
+
 	$rootScope.scopeObj = $scope;
 
 	$scope.content = '';
@@ -122,8 +120,6 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 			$scope.envInfo = result;
 			CacheLib.write('envInfo', result);
 			$scope.$apply();
-
-			console.info($scope.envInfo);
 		});
 	}
 
@@ -133,10 +129,6 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 	$scope.resultSet = {};
 
 	var loadEnv = function (env) {
-
-		console.log('loadEnv');
-		console.log(env);
-
 		if ($scope.selectedEnv) {
 			$scope.selectedEnv.save.inputText = $scope.inputText.this.getValue();
 			$scope.selectedEnv.save.outputText = $scope.outputText.this.getValue();
@@ -166,6 +158,8 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 		if (env.save == undefined) {
 			env.save = {};
 			env.save.property = {};
+			env.result = {};
+			env.result.property = {};
 		}
 
 		$scope.selectedEnv = env;
@@ -415,7 +409,6 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 			switch (d.type) {
 				case 'result':
 					$scope.resultSet = resultGenerate(d.data);
-					console.info($scope.resultSet);
 					$rootScope.scopeObj.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
 					$scope.outputText.this.getDoc().setValue(JSON.stringify(d.data));
 					if (d.data.debugOutput) $scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
@@ -424,7 +417,20 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 
 					// history
 					$scope.loadEnv($scope.selectedEnv);
-					console.info($scope.selectedEnv);
+
+					for (var p in $scope.propertyString) {
+						$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
+					}
+
+					for (let p in $scope.propertyInput) {
+						try {
+							$scope.selectedEnv.result.property[p] = JSON.parse(JSON.stringify($scope.propertyInput[p]));
+						} catch (e) { }
+					}
+
+					$scope.selectedEnv.result.input = $scope.inputText.this.getValue().split('\n');
+					$scope.selectedEnv.result.output = JSON.parse($scope.outputText.this.getValue());
+					$scope.selectedEnv.result.env = [$scope.selectedEnv.parent.name, $scope.selectedEnv.name];
 
 					var history = HistoryLib.read();
 					if (!history) history = [{}];
@@ -587,9 +593,19 @@ app.directive("sharebox", function ($rootScope) {
 		templateUrl: './templates/shareBox.html', /* temp */
 		transclude: true,
 		scope: {
-			visible: "=",
+			visible: "="
 		},
 		link: function ($scope) {
+			$scope.shareStep = 0;
+			$scope.shareMsg = '';
+			$scope.shareURL = '';
+			$scope.openBrowser = $rootScope.openBrowser;
+			$scope.closeBox = function (e) {
+				$rootScope.shareBoxVisible = false;
+				$scope.title = '';
+				$scope.description = '';
+				$scope.shareStep = 0;
+			}
 			$scope.ignoreEvent = function (e) {
 				e.stopPropagation();
 			},
@@ -599,14 +615,22 @@ app.directive("sharebox", function ($rootScope) {
 					e.preventDefault();
 				}
 			}
+			$scope.copyURL = function (e) {
+				require('electron').clipboard.writeText($scope.shareURL);
+			}
 			$scope.submitForm = function (e) {
 				if (!$rootScope.ghToken) {
-					alert('Require Login');
+					$scope.shareStep = 1;
+					$scope.shareMsg = 'Require login token.';
 					return false;
 				}
-				for (var p in $rootScope.scopeObj.propertyString) {
-					$rootScope.scopeObj.propertyInput[p] = $rootScope.scopeObj.propertyString[p].this.getValue();
+				if (!$scope.title) {
+					$scope.shareStep = 1;
+					$scope.shareMsg = 'Title field is required.';
+					return false;
 				}
+				$scope.shareStep = 2;
+				var result = $rootScope.scopeObj.selectedEnv.result;
 
 				let env = (() => {
 					return {
@@ -628,20 +652,13 @@ app.directive("sharebox", function ($rootScope) {
 					}
 				}
 
-				for (let p in $rootScope.scopeObj.propertyInput) {
-					try {
-						obj.data.properties[p] = JSON.parse(JSON.stringify($rootScope.scopeObj.propertyInput[p]));
-					} catch (e) { }
+				if (!result || !result.output) {
+						$scope.shareStep = 1;
+						$scope.shareMsg = 'Result not found.';
+						return false;
 				}
 
-				obj.data.input = $rootScope.scopeObj.inputText.this.getValue().split('\n');
-				obj.data.output = JSON.parse($rootScope.scopeObj.outputText.this.getValue());
-				
-				obj.data.env = [$rootScope.scopeObj.selectedEnv.parent.name, $rootScope.scopeObj.selectedEnv.name]
-
-				$scope.title = '';
-				$scope.description = '';
-				$rootScope.shareBoxVisible = false;
+				obj.data = JSON.parse(JSON.stringify(result));
 
 				const httpContext = {
 					'headers': {
@@ -649,13 +666,13 @@ app.directive("sharebox", function ($rootScope) {
 					}
 				};
 
-				console.info(obj);
+				console.info(`Share Request >> ${JSON.stringify(obj)}`);
 
 				const request = require('request');
 				request({
-					//url: 'http://auth.regular.express/share',
+					url: 'http://auth.regular.express/share',
 					//url: 'http://ec2-52-78-231-172.ap-northeast-2.compute.amazonaws.com/share',
-					url: 'http://lab.prev.kr:7777/share',
+					//url: 'http://lab.prev.kr:7777/share',
 					method: 'POST',
 					headers: {
 						"Content-Type": "application/json",
@@ -667,14 +684,25 @@ app.directive("sharebox", function ($rootScope) {
 					try {
 						if (res.statusCode == 200) {
 							data = JSON.parse(body);
-							//window.open(data.url);
+							$scope.shareStep = 3;
+							$scope.shareURL = data.url; // temp
+							console.info('SHARE COMPLETED : ' + data.url);
 						}
-						else alert(`Share Failed : ${e.message}`);
+						else {
+							$scope.shareStep = 1;
+							$scope.shareMsg = `[${res.statusCode}] Server Error`;
+							console.warn(body);
+							console.info(`Share Failed : Server Error ${res.statusCode}.`);
+						}
 					}
 					catch (e) {
+						$scope.shareStep = 1;
+						$scope.ShareMsg = 'Unexpected Error.';
+						console.warn(e);
 						console.warn(`SHARING FAILED : ${e.message}`);
 					}
-					console.info('SHARE COMPLETED : ' + data.url);
+
+					$scope.$apply();
 				});
 
 				

@@ -1,5 +1,49 @@
-<section class="share-box" ng-class='{ show: visible }'>
-    <content ng-click="ignoreEvent($event)">
+<section class="sb_wrap" ng-class='{ show: visible }'>
+    <div class="sb_dimmed"></div>
+    <div class="sb_frame">
+        <div class="sb_context">
+            <div class="sb_section">
+                <div class="sb_title">Share This Expression</div>
+                <div class="sb_seperator"></div>
+                <div class="sb_section_input">
+                    <div class="sb_section">Title</div>
+                    <input ng-keydown="ignoreKeyEvent($event)" ng-model="title"></textarea>
+                    <div class="sb_section">Description</div>
+                    <textarea ng-model="description"></textarea>
+                    <div class="buttons" ng-show="shareStep <= 1">
+                        <button ng-click="submitForm($event)">Share</button>
+                    </div>
+                </div>
+                <div class="sb_section_progress" ng-show="shareStep == 2">
+                    <div class="showbox">
+                        <div id="loader" class="loader">
+                        <svg class="circular" viewBox="25 25 50 50">
+                            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                        </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="sb_section_result" ng-show="shareStep == 3">
+                    <div class="sb_section">Successfully Shared Expression at</div>
+                    <input value="{{shareURL}}" style="
+                        width: 70%;
+                        text-align: left;
+                    ">
+                    <span>&nbsp;
+                        <a href="javascript:void(0)" ng-click="copyURL()">Copy</a> | 
+                        <a href="javascript:void(0)" ng-click="openBrowser(shareURL)">Open Link</a>
+                    </span>
+                </div>
+                <div class="sb_section_error" ng-show="shareStep == 1">
+                    <div class="sb_section sb_error">Error: {{shareMsg}}</div>
+                </div>
+                <div class="sb_footer"></div>
+            </div>
+            <div ng-click="closeBox($event)" class="sb_close"></div>
+        </div>
+    </div>
+    
+    <!--<content ng-click="ignoreEvent($event)">
         <form>
             <h2 class="title">Share This Expression</h2>
             <h3>Title</h3>
@@ -10,5 +54,5 @@
                 <button ng-click="submitForm($event)">Share</button>
             </div>
         </form>
-    </content>
+    </content>-->
 </section>

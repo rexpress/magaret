@@ -158,9 +158,9 @@ app.factory('Environments', function() {
 					}
 					catch (e) {
 						console.log(body);
-						console.warn(`Loading Env Failed : ${e.message}`);
+						console.warn(`LoadEnv Failed : ${e.message}`);
 					}
-					console.log('Loading env is finished complete');
+					console.log('LoadEnv Completed');
 					onCompleteCallback(data);
 				}
 			);

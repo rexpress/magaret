@@ -410,82 +410,232 @@ table.result-table {
 	pointer-events: none;
 }
 
-.share-box {
+.box-layer {
+	position: fixed;
+	z-index: 999;
+	top: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
+}
+
+.sb_wrap {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	white-space: nowrap;
+	text-align: center;
+	display: none;
+	z-index: 999;
+}
+
+.sb_wrap.show {
+	display: block;
+}
+
+.sb_dimmed {
+	background: rgba(0,0,0,0.5);
 	position: absolute;
 	top: 0;
 	left: 0;
-	background: rgba(123, 123, 123, 0.6);
+	bottom: 0;
+	right: 0;
 	z-index: 999;
-	display: none;
 }
 
-.share-box.show {
+.sb_frame {
+	display: inline-block;
+	position: relative;
+	width: 556px;
+	white-space: normal;
+	vertical-align: middle;
+	z-index: 999;
+}
+
+.sb_context {
+	padding: 0 20px 0 20px;
+	background: #f7f7f7;
+}
+
+.sb_title {
+	font-weight: 300;
+	font-size: 1.2em;
+	margin-bottom: 0.3em;
+  padding: 10px 0 0 0;
+}
+
+.sb_section {
+	font-weight: 300;
+	font-size: 1em;
+	margin-bottom: 0.3em;
+	padding: 10px 0 0 0;
+}
+
+.sb_seperator {
+	display: block;
+  width: 46px;
+  height: 1px;
+  margin: 0 auto 10px;
+  background: #ddd;
+}
+
+.sb_footer {
+	height: 20px;
+}
+
+.sb_close:after {
+	display: inline-block;
+	cursor: pointer;
+	position: absolute;
+	text-align: right;
+	top: 15px;
+	right: 16px;
+  content: "\d7";
+	font-size: 50px;
+	line-height: 25px;
+	font-weight: 300;
+	text-align: center;
+	color: #b5b5b5;
+}
+
+.sb_context.show {
 	display: block;
 }
 
-.share-box content {
-	display: block;
-    position: relative;
-    width: 420px;
-    color: white;
-	top: calc(50% - 170px);
+.sb_context textarea {
+	width: calc(100% - 10px);
+	resize: none;
+	height: 2.5em;
+	font-size: 1em;
+	font-weight: 300;
+	border: 0px;
+	padding: 5px;
 	margin: auto;
-    z-index: 100;
 }
 
-.share-box form {
-	background: #252526;
-    box-shadow: 0 2px 8px #000;
-    padding: 1em;
-    width: 420px;
+.sb_context input {
+	width: calc(100% - 10px);
+	height: 1em;
+	font-size: 1em;
+	font-weight: 300;
+	border: 0px;
+	padding: 5px;
+	outline: 0px;
+	margin: auto;
 }
 
-.share-box h2 {
-    margin: 0;
-    padding: 0;
-    font-weight: 300;
-    font-size: 1.8em;
+.sb_context button {
+	background-color: #11b9b9;
+	border: none;
+	color: white;
+	padding: 8px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	outline: none;
 }
 
-.share-box h3 {
-    font-weight: 300;
-    font-size: 1.2em;
-    margin-bottom: 0.3em;
-}
-
-.share-box textarea {
-    width: 98.6%;
-    resize: none;
-    height: 2.5em;
-    font-size: 1em;
-		border: 0px;
-		padding: 5px;
-}
-
-.share-box input {
-		width: 98.6%;
-		height: 1em;
-		font-size: 1em;
-		border: 0px;
-		padding: 5px;
-		outline: 0px;
-}
-
-.share-box button {
-    background-color: #123765;
-    border: none;
-    color: white;
-    padding: 8px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    outline: none;
-}
-
-.share-box .buttons {
+.sb_context .buttons {
 	margin-top: 20px;
 	text-align: center;
+}
+
+.sb_section_progress {
+	margin-top: 15px;
+}
+
+.sb_section_error {
+	background: #fff0f0;
+	border: 1px solid #f99595;
+	border-radius: 0.2em;
+	margin-top: 15px;
+	padding: 0px 8px 10px 8px;
+}
+
+.sb_error {
+	color: #ff6060;
+}
+
+.sb_section_result {
+	background: #f0f7ff;
+	border: 1px solid #95b8f9;
+	border-radius: 0.2em;
+	margin-top: 15px;
+	padding: 0px 8px 10px 8px;
+}
+
+/* Modern Google Loader in Pure CSS */
+/* https://gist.github.com/CodeMyUI/3c3a57a17cb56828356a */
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
+.loader {
+  position: relative;
+  margin: 0px auto;
+  width: 100px;
+  height: 100px;
+  zoom: 1;
+}
+
+.circular {
+  animation: rotate 2s linear infinite;
+  height: 100px;
+  position: relative;
+  width: 100px;
+}
+
+.path {
+  stroke-dasharray: 1,200;
+  stroke-dashoffset: 0;
+  animation:
+    dash 1.5s ease-in-out infinite,
+    color 6s ease-in-out infinite;
+  stroke-linecap: round;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1,200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -124;
+  }
+}
+
+@keyframes color{
+  100%, 0% {
+    stroke: #d62d20;
+  }
+
+  40% {
+    stroke: #0057e7;
+  }
+
+  66% {
+    stroke: #008744;
+  }
+
+  80%, 90% {
+    stroke: #ffa700;
+  }
 }
