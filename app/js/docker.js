@@ -3,8 +3,8 @@
   {
     st: '##START_RESULT##',
     ed: '##END_RESULT##',
-    buff: '',
     exec: (image, property, testset, callback) => {
+      var buff = '';
       const spawn = require('child_process').spawn;
       var property = JSON.stringify(property);
       var testset = JSON.stringify(testset);
@@ -20,10 +20,10 @@
       });
 
       ls.stdout.on('data', data => {
-        docker.buff += data.toString();
-        if (docker.dataCheck(docker.buff)) {
-          let str = docker.dataExtract(docker.buff);
-          docker.buff = '';
+        buff += data.toString();
+        if (docker.dataCheck(buff)) {
+          let str = docker.dataExtract(buff);
+          buff = '';
           return callback(str);
         }
       });
@@ -33,9 +33,6 @@
       ls.on('close', data => {
         return callback({ type: 'end', data: `${data}` });
       });
-    },
-    clearBuffer: () => {
-      docker.buff = '';
     },
     dataCheck: data => {
       return (typeof data === 'undefined' ? false :
@@ -54,6 +51,25 @@
         return;
       }
       return { type: 'result', data: data };
+    },
+    pull: (image, callback) => {
+      const spawn = require('child_process').spawn;
+      console.info(`pull >> ${image}`);
+
+      let ls = spawn('docker', ['pull', `${image}`], {
+        detached: true,
+        windowsVerbatimArguments: true
+      });
+
+      ls.stdout.on('data', data => {
+        return callback({ type: 'log', data: `${data}` });
+      });
+      ls.stderr.on('data', data => {
+        return callback({ type: 'log', data: `${data}` });
+      });
+      ls.on('close', data => {
+        return callback({ type: 'end', data: `${data}` });
+      });
     },
   }
   w.mg_docker = docker;

@@ -21,6 +21,7 @@ app.run(function ($rootScope, GitHubToken) {
 	$rootScope.rightVisible = false;
 	$rootScope.shareBoxVisible = false;
 	$rootScope.scopeObj = null;
+	$rootScope.imageInfo = {};
 
 	$rootScope.$on('$routeChangeStart', function (event, next) {
 		$rootScope.currentRoute = next;
@@ -102,8 +103,6 @@ app.run(function ($rootScope, GitHubToken) {
 	}
 });
 
-
-
 app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib, GitHubToken) {
 	var envInfo = CacheLib.read('envInfo');
 
@@ -116,9 +115,58 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 	else {
 		$scope.envInfo = {};
 
+		var getUnique = function(el){
+			var u = {}, a = [];
+			for(var i = 0, l = el.length; i < l; ++i){
+					if(u.hasOwnProperty(el[i])) {
+						continue;
+					}
+					a.push(el[i]);
+					u[el[i]] = 1;
+			}
+			return a;
+		}
+
 		Environments.load(function (result) {
 			$scope.envInfo = result;
 			CacheLib.write('envInfo', result);
+
+			var array = [];
+			for (let p in $scope.envInfo)
+				for (let c in $scope.envInfo[p].children) {
+					array.push($scope.envInfo[p].children[c].info.docker_image);
+				}
+			array = getUnique(array);
+			for (let arr of array) {
+				$rootScope.imageInfo[arr] = [0];
+			}
+			for (let arr of array) {
+				/*if (!arr.search(':'))
+					continue;
+				let s = arr.split(':');
+				getImageInspect(s[0], s[1], (ph, result) => {
+					console.log(`${arr} ${result}`);
+				})*/
+				testImage(arr, (result) => {
+					// 0 : installed
+					// 1 : not installed
+					// 2 : need update
+					$rootScope.imageInfo[arr][0] = 0;
+					if (!result[1])
+						$rootScope.imageInfo[arr][0] = 1;
+					else if (result[0] != result[1])
+						$rootScope.imageInfo[arr][0] = 2;
+
+					console.info(`${arr} ${$rootScope.imageInfo[arr][0]}`);
+				});
+
+
+				for (let p in $scope.envInfo)
+					for (let c in $scope.envInfo[p].children) {
+						$scope.envInfo[p].children[c].image = $rootScope.imageInfo[$scope.envInfo[p].children[c].info.docker_image];
+					}
+			}
+			console.info(array);
 			$scope.$apply();
 		});
 	}
@@ -129,6 +177,7 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 	$scope.resultSet = {};
 
 	var loadEnv = function (env) {
+		console.info(env);
 		if ($scope.selectedEnv) {
 			$scope.selectedEnv.save.inputText = $scope.inputText.this.getValue();
 			$scope.selectedEnv.save.outputText = $scope.outputText.this.getValue();
@@ -312,6 +361,46 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 
 	$scope.shareForm = function () {
 		$scope.shareBox = true;
+	}
+
+	$scope.updateForm = function () {
+		const async = require('async');
+		let env = (() => {
+			return {
+				image: $scope.selectedEnv.info.docker_image,
+			}
+		})();
+		async.waterfall([
+			function (callback) {
+				mg_docker.pull(env.image, d => {
+					switch (d.type) {
+						case 'log':
+							$scope.notice.info(d.data, 8000);
+						break;
+						default:
+						console.info(d.data);
+							if (d.data == 0)
+								callback(null);
+						break;
+					}
+				});
+			},
+			function (callback) {
+				testImage(env.image, (result) => {
+					$rootScope.imageInfo[env.image][0] = 0;
+					if (!result[1])
+						$rootScope.imageInfo[env.image][0] = 1;
+					else if (result[0] != result[1])
+						$rootScope.imageInfo[env.image][0] = 2;
+					
+					if (!$rootScope.imageInfo[env.image][0])
+						callback(null);
+				});
+			},
+			function (callback) {
+				$scope.testForm();
+			}
+		])
 	}
 
 	$scope.testForm = function () {
@@ -642,8 +731,8 @@ app.directive("sharebox", function ($rootScope) {
 					'access_token': $rootScope.ghToken,
 					'login_type': 'github',
 					'data': {
-						'title': $scope.title,
-						'description': $scope.description,
+						'title': '',
+						'description': '',
 						'env': [ ],
 						'tags': [ ],
 						'properties': { },
@@ -659,6 +748,8 @@ app.directive("sharebox", function ($rootScope) {
 				}
 
 				obj.data = JSON.parse(JSON.stringify(result));
+				obj.data.title = $scope.title;
+				obj.data.description = $scope.description;
 
 				const httpContext = {
 					'headers': {
