@@ -15,12 +15,15 @@ app.factory('HistoryLib', function () {
 	return {
 		read: function() {
 			try {
-				return jsonfile.readFileSync( getFilePath() ).data;
+				var data = jsonfile.readFileSync( getFilePath() ).data;
+				if (!Array.isArray(data))
+					return [];
+				return data;
 			} catch (e) {
-				return null;
+				return [];
 			}
 		},
-		write: function() {
+		write: function(value) {
 			jsonfile.writeFileSync(getFilePath(), { timestamp: Date.now(), data: value });
 		}
 	}

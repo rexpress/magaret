@@ -156,8 +156,6 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 						$rootScope.imageInfo[arr][0] = 1;
 					else if (result[0] != result[1])
 						$rootScope.imageInfo[arr][0] = 2;
-
-					console.info(`${arr} ${$rootScope.imageInfo[arr][0]}`);
 				});
 
 
@@ -166,7 +164,6 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 						$scope.envInfo[p].children[c].image = $rootScope.imageInfo[$scope.envInfo[p].children[c].info.docker_image];
 					}
 			}
-			console.info(array);
 			$scope.$apply();
 		});
 	}
@@ -208,7 +205,7 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 			env.save = {};
 			env.save.property = {};
 			env.result = {};
-			env.result.property = {};
+			env.result.properties = {};
 		}
 
 		$scope.selectedEnv = env;
@@ -515,7 +512,7 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 
 					for (let p in $scope.propertyInput) {
 						try {
-							$scope.selectedEnv.result.property[p] = JSON.parse(JSON.stringify($scope.propertyInput[p]));
+							$scope.selectedEnv.result.properties[p] = JSON.parse(JSON.stringify($scope.propertyInput[p]));
 						} catch (e) { }
 					}
 
@@ -523,11 +520,11 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 					$scope.selectedEnv.result.output = JSON.parse($scope.outputText.this.getValue());
 					$scope.selectedEnv.result.env = [$scope.selectedEnv.parent.name, $scope.selectedEnv.name];
 
-					var history = HistoryLib.read();
-					if (!history) history = [{}];
-					else history = history.data;
+					var hist = HistoryLib.read();
+					if (!hist) hist = [{}];
 
-					history = history.push(env);
+					hist.unshift($scope.selectedEnv);
+					HistoryLib.write(hist)
 					break;
 				case 'log':
 					$scope.notice.info(d.data, 8000);
