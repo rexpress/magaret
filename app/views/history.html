@@ -1,33 +1,21 @@
 <!-- pseudo design -->
 <section class="history" ng-class='{ show: visible, left: alignment === "left", right: alignment === "right" }'>
-  <div class="history-box" ng-repeat="item in content track by $index">
+  <div class="history-box" ng-repeat="item in historyContent track by $index">
     <content ng-click="loadEnv(item)">
       <ul class="properties">
         <li>
           <span class="key">Environment</span>
-          <span class="value">{{ item.env }}</span>
+          <span class="value">{{ item.displayName }}</span>
         </li>
-        <li ng-repeat="property in item.properties">
-          <span class="key">{{ property.name }}</span>
-          <span class="value">{{ property.value }}</span>
-        </li>
-        <li>
-          <span class="key">columns</span>
-          <span class="value">A,B,C</span>
-        </li>
-        <li>
-          <span class="key">columns.t...</span>
-          <span class="value">STRING,STRING,STRING</span>
-        </li>
-        <li>
-          <span class="key">input.reg...</span>
-          <span class="value">False</span>
+        <li ng-repeat="(key, val) in item.result.properties">
+          <span class="key">{{ key }}</span>
+          <span class="value">{{ val }}</span>
         </li>
       </ul>
       <div class="last clearfix">
 
         <div class="created fr">
-          2016-10-24 18:09:59
+          {{ item.result.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}
         </div>
       </div>
     </content>

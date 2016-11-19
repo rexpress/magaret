@@ -56,15 +56,32 @@ header ul#gnb li a:hover {
 header ul#gnb li a.selected {
 	color: white
 }
-
-header #propic {
-	padding: 10px 0px;
-}
-
 header #propic a {
 	text-decoration: none;
 	font-size: 14px;
 	color: white;
+}
+
+header .user_profile {
+	width: 40px;
+	height: 40px;
+	background-size: cover;
+	border-radius: 50px;
+	margin-right: -10px;
+}
+
+header .login_phbox {
+	width: 40px;
+	height: 40px;
+	background: url(https://stylus-lang.com/img/octocat.svg) #cccccc;
+	border-radius: 50px;
+	margin-right: -10px;
+}
+
+header .login_phtext {
+	position: absolute;
+	margin: -28px -1px;
+	background: rgba(13, 39, 72, 1);
 }
 
 .fl {

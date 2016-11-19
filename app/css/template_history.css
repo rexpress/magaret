@@ -47,16 +47,18 @@ panel > .show {
   padding: 0;
   /*margin-top: 16px;*/
   font-size: 13px;
+  text-overflow: ellipsis;
+  width: 80px !important;
 }
 
 .history-box .properties span {
   border-bottom: 1px solid #ccc;
   padding: 2px 3px;
+  overflow: hidden;
 }
 
 .history-box .properties span.key {
   display: inline-block;
-  width: 80px;
   color: #444;
   margin-right: 4px;
 }

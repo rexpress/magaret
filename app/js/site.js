@@ -16,12 +16,13 @@ app.config(function ($routeProvider) {
 });
 
 
-app.run(function ($rootScope, GitHubToken) {
+app.run(function ($rootScope, GitHubToken, HistoryLib) {
 	$rootScope.historyPanel = false;
 	$rootScope.rightVisible = false;
 	$rootScope.shareBoxVisible = false;
 	$rootScope.scopeObj = null;
 	$rootScope.imageInfo = {};
+	$rootScope.historyContent = HistoryLib.read();
 
 	$rootScope.$on('$routeChangeStart', function (event, next) {
 		$rootScope.currentRoute = next;
@@ -38,8 +39,12 @@ app.run(function ($rootScope, GitHubToken) {
 	}
 
 
-	var ghToken = GitHubToken.load();
-	$rootScope.ghToken = ghToken;
+	var tokenObj = GitHubToken.load();
+	if (!tokenObj)
+		tokenObj = {};
+	$rootScope.ghToken = tokenObj.access_token;
+	$rootScope.ghPropic = tokenObj.avatar_url;
+	console.log($rootScope.ghPropic);
 
 	$rootScope.actLogin = (e) => {
 		var once = false;
@@ -47,16 +52,17 @@ app.run(function ($rootScope, GitHubToken) {
 			if (once) return false;
 			var obj = JSON.parse(arg);
 
+			once = true;
 			if (obj.access_token) {
 				GitHubToken.save(obj.access_token);
 				$rootScope.ghToken = obj.access_token;
+				$rootScope.ghPropic = tokenObj.avatar_url;
 				$rootScope.$apply();
 				alert('Authorization Successful.');
 			}
 			else {
 				alert('Auth Failed : ' + obj.error);
 			}
-			once = true;
 		});
 		let win = new BrowserWindow({width: 800, height: 600, webPreferences: {
 			preload: require('path').join(__dirname, 'js/authPreload.js'),
@@ -71,7 +77,6 @@ app.run(function ($rootScope, GitHubToken) {
 		GitHubToken.reset();
 		alert('Logout Account');
 		$rootScope.ghToken = null;
-		$rootScope.$apply();
 	}
 
 	$rootScope.showRight = (e) => {
@@ -519,12 +524,14 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 					$scope.selectedEnv.result.input = $scope.inputText.this.getValue().split('\n');
 					$scope.selectedEnv.result.output = JSON.parse($scope.outputText.this.getValue());
 					$scope.selectedEnv.result.env = [$scope.selectedEnv.parent.name, $scope.selectedEnv.name];
+					$scope.selectedEnv.result.timestamp = Date.now();
 
 					var hist = HistoryLib.read();
 					if (!hist) hist = [{}];
 
 					hist.unshift($scope.selectedEnv);
-					HistoryLib.write(hist)
+					HistoryLib.write(hist);
+					$rootScope.historyContent = HistoryLib.read();
 					break;
 				case 'log':
 					$scope.notice.info(d.data, 8000);
@@ -640,7 +647,7 @@ app.directive("menu", function () {
 	};
 });
 
-app.directive("panel", function () {
+app.directive("panel", function (HistoryLib) {
 	return {
 		restrict: "E",
 		templateUrl: './views/history.html', /* temp */
@@ -657,16 +664,6 @@ app.directive("panel", function () {
 						console.info(env);
 						$rootScope.test = env;
 					}
-
-					$scope.content = [{
-						env: 'flume',
-						properties: [{
-							'name': 'regex',
-							'type': 'value',
-							'value': '1234'
-						}],
-						date: Date.now()
-					}]
 
 					$scope.test = function(arg) {
 							console.log(arg);

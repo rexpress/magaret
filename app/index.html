@@ -78,8 +78,14 @@
 			</li>
 		</ul>
 		<div id="propic" class="fr">
-			<a href="javascript:void(0)" ng-show="ghToken == null" ng-click="actLogin($event)">LOGIN</a>
-			<a href="javascript:void(0)" ng-show="ghToken != null" ng-click="actLogout($event)">LOGOUT</a>
+			<a href="javascript:void(0)" ng-show="ghToken == null" ng-click="actLogin($event)">
+				<div class="login_phbox"></div>
+				<div ng-show="ghToken == null" ng-click="actLogin($event)" class="login_phtext">LOGIN</div>
+			</a>
+			<a href="javascript:void(0)" ng-show="ghToken != null" ng-click="actLogout($event)">
+				<div class="user_profile" style="background: url({{ghPropic}}) #eee;background-size: cover;"></div>
+			</a>
+			
 		</div>
 		<!--
 		<nav id="gnb">

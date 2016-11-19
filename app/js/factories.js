@@ -42,13 +42,43 @@ app.factory('GitHubToken', function () {
 		return base + 'appkey.json';
 	}
 	return {
-		'save': function(value) {
-			jsonfile.writeFileSync(getFilePath(), { data: value });
+		'save': function(token) {
+			if (this.load() == token) return;
+			const async = require('async');
+			async.parallel([
+				function (callback) {
+					request.get('https://api.github.com/user',
+						{
+							'headers': {
+								'User-Agent': 'regular.express Client',
+								'Authorization': `token ${token}`	
+							},
+						},
+						(err, res, body) => {
+							var data;
+
+							if (!err) {
+								var obj = JSON.parse(body);
+								callback(null, obj);
+							}
+							else {
+								callback(null, null)
+							}
+						}
+					);
+				},
+			], function(err, result) {
+				console.log(result);
+				jsonfile.writeFileSync(getFilePath(), { data: token, user: result[0] });
+			})
 		},
 		'load': function() {
 			try {
 				var content = jsonfile.readFileSync( getFilePath() );
-				return content.data;
+				return {
+					'avatar_url': content.user.avatar_url,
+					'access_token': content.data
+				};
 
 			}catch(error) {
 				return null
@@ -57,6 +87,30 @@ app.factory('GitHubToken', function () {
 		'reset': function() {
 			jsonfile.writeFileSync(getFilePath(), { data: null });
 			return null;
+		},
+		'verify': function(token) {
+			request.get('https://api.github.com/user',
+				{
+					'headers': {
+						'User-Agent': 'regular.express Client',
+						'Authorization': `token ${token}`	
+					},
+				},
+				(err, res, body) => {
+					var data;
+
+					console.log(body);
+					if (!err) {
+						var obj = JSON.parse(body);
+						console.log(obj);
+						return obj;
+					}
+					else {
+						console.error(res);
+						return null;
+					}
+				}
+			);
 		}
 	}
 })
@@ -128,7 +182,6 @@ app.factory('Environments', function() {
 			};
 
 			var clearName = (obj) => {
-				console.warn(obj);
 				for (let a in obj) {
 					let parent = obj[a].info.title.split(' ');
 					parent = parent[parent.length - 1];
