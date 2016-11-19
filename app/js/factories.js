@@ -29,7 +29,7 @@ app.factory('HistoryLib', function () {
 	}
 });
 
-app.factory('GitHubToken', function () {
+app.factory('GitHubToken', function ($rootScope) {
 	const jsonfile = require('jsonfile');
 	const fs = require('fs');
 
@@ -43,7 +43,7 @@ app.factory('GitHubToken', function () {
 	}
 	return {
 		'save': function(token) {
-			if (this.load() == token) return;
+			if (token && this.load() == token) return this.load();
 			const async = require('async');
 			async.parallel([
 				function (callback) {
@@ -68,8 +68,12 @@ app.factory('GitHubToken', function () {
 					);
 				},
 			], function(err, result) {
-				console.log(result);
-				jsonfile.writeFileSync(getFilePath(), { data: token, user: result[0] });
+				var res = { data: token, user: result[0] };
+				jsonfile.writeFileSync(getFilePath(), res);
+				$rootScope.ghToken = res.data;
+				$rootScope.ghPropic = res.user.avatar_url;
+				console.log($rootScope);
+				$rootScope.$apply();
 			})
 		},
 		'load': function() {

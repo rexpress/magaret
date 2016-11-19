@@ -73,8 +73,12 @@ header .user_profile {
 header .login_phbox {
 	width: 40px;
 	height: 40px;
-	background: url(https://stylus-lang.com/img/octocat.svg) #cccccc;
-	border-radius: 50px;
+	background: url(http://stylus-lang.com/img/octocat.svg);
+	background-color: white;
+	background-repeat: no-repeat;
+	background-size: contain;
+	border-radius: 2000000px;
+	border: 1px solid rgba(0, 0, 0, 0.6);
 	margin-right: -10px;
 }
 

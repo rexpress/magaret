@@ -55,9 +55,6 @@ app.run(function ($rootScope, GitHubToken, HistoryLib) {
 			once = true;
 			if (obj.access_token) {
 				GitHubToken.save(obj.access_token);
-				$rootScope.ghToken = obj.access_token;
-				$rootScope.ghPropic = tokenObj.avatar_url;
-				$rootScope.$apply();
 				alert('Authorization Successful.');
 			}
 			else {
