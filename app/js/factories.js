@@ -72,6 +72,7 @@ app.factory('GitHubToken', function ($rootScope) {
 				jsonfile.writeFileSync(getFilePath(), res);
 				$rootScope.ghToken = res.data;
 				$rootScope.ghPropic = res.user.avatar_url;
+				$rootScope.ghName = res.user.name;
 				console.log($rootScope);
 				$rootScope.$apply();
 			})
@@ -81,7 +82,8 @@ app.factory('GitHubToken', function ($rootScope) {
 				var content = jsonfile.readFileSync( getFilePath() );
 				return {
 					'avatar_url': content.user.avatar_url,
-					'access_token': content.data
+					'access_token': content.data,
+					'name': content.user.name
 				};
 
 			}catch(error) {

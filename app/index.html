@@ -82,8 +82,12 @@
 				<div class="login_phbox"></div>
 				<!--<div ng-show="ghToken == null" ng-click="actLogin($event)" class="login_phtext">LOGIN</div>-->
 			</a>
-			<a href="javascript:void(0)" ng-show="ghToken != null" ng-click="actLogout($event)">
-				<div class="user_profile" style="background: url({{ghPropic}}) #eee;background-size: cover;"></div>
+			<ul class="user_logined" ng-show="ghToken != null">
+				<li class="user_name">{{ghName}}</li>
+				<li class="user_profile" style="background: url({{ghPropic}}) #eee;background-size: cover;"></li>
+				<li class="user_sep"></li>
+				<li class="user_logout" ng-click="actLogout($event)"><button>Logout</button></li>
+			</ul>
 			</a>
 			
 		</div>

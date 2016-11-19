@@ -44,7 +44,8 @@ app.run(function ($rootScope, GitHubToken, HistoryLib) {
 		tokenObj = {};
 	$rootScope.ghToken = tokenObj.access_token;
 	$rootScope.ghPropic = tokenObj.avatar_url;
-	console.log($rootScope.ghPropic);
+	$rootScope.ghName = tokenObj.name;
+	console.log(tokenObj);
 
 	$rootScope.actLogin = (e) => {
 		var once = false;
