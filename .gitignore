@@ -4,6 +4,9 @@ logs
 *.log
 npm-debug.log*
 
+# History
+history/*
+
 # Cache
 cache/*
 
