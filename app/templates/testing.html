@@ -46,7 +46,9 @@
 							<!--<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>-->
 							<input ng-switch-when="number" type="number" ng-model="propertyInput[property.name]">
 							<input ng-switch-when="boolean" type="checkbox" ng-model="propertyInput[property.name]"></textarea>
-							<select ng-switch-when="list" ng-model="propertyInput[property.name]" ng-option="property.list"></select>
+							<select ng-switch-when="list" ng-model="propertyInput[property.name]" ng-options="key as value for (key, value) in property.list">
+								<option ng-repeat="(key, val) in property.list" ng-selected="property.default == key" ng-value="key">{{val}}</option>
+							</select>
 						</div>
 
 						<pre ng-show="property.type == 'string' || property.type == 'number'" class="example">example: {{ property.example }}</pre>

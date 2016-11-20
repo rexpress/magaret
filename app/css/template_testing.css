@@ -57,6 +57,26 @@ testing-page section.info .details {
 	font-size: 0.75rem;
 }
 
+/* Material design select */
+/* https://codepen.io/pudgereyem/pen/PqBxQx/ */
+testing-page select {
+  font-family: monospace;
+  background-color: transparent;
+  width: 100%;
+  padding: 4px 0;
+  font-size: 16px;
+  color: rgba(0,0,0, 1);
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0, 0.3);
+}
+
+/* Remove focus */
+testing-page select:focus {
+  outline: none;
+}
+
+/* buttons */
+
 testing-page section.buttons {
 	display: initial;
 	float: right;

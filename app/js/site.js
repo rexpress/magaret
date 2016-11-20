@@ -226,6 +226,93 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 	};
 
 	$scope.loadEnv = loadEnv;
+	console.log($scope.loadEnv);
+
+	$scope.loadEnv({
+		"name": "test-env",
+		"parent": {
+			"name": "test",
+			"info": {
+				"description": "Test Environment",
+				"website": "https://placeholder/",
+				"icon": {
+					"type": "devicon",
+					"value": "test"
+				},
+				"title": "TestEnv"
+			}
+		},
+		"info": {
+			"properties": [{
+				"type": "string",
+				"help": "Regex string.",
+				"name": "input.regex",
+				"example": "(0[0-9]{2})-([0-9]{3,4})-([0-9]{3,4})",
+				"required": true,
+				"content": "(0[0-9]{2})-([0-9]{3,4})-([0-9]{3,4})",
+				"$$hashKey": "object:115"
+			}, {
+				"type": "string",
+				"help": "Whitepsace seperated column list.",
+				"name": "columns",
+				"example": "A,B,C",
+				"required": true,
+				"content": "A,B,C",
+				"$$hashKey": "object:116"
+			}, {
+				"type": "string",
+				"help": "Comma seperated column type list.",
+				"name": "columns.types",
+				"example": "STRING,STRING,STRING",
+				"required": true,
+				"content": "STRING,STRING,STRING",
+				"$$hashKey": "object:117"
+			}, {
+				"type": "boolean",
+				"help": "Determine regex case insensitive.",
+				"name": "input.regex.case.insensitive",
+				"default": false,
+				"example": "",
+				"required": false,
+				"content": "",
+				"$$hashKey": "object:118"
+			}, {
+				"name": "Test Type",
+				"type": "list",
+				"list" : {
+					"a" : "Type A",
+					"b" : "Type B"
+				},
+				"default": "a",
+				"example": "",
+				"help" : "Type."
+			}, {
+				"name": "Food",
+				"type": "list",
+				"list" : {
+					"c" : "Chicken",
+					"p" : "Pizza",
+					"r" : "Ramen",
+					"s" : "Sushi",
+				},
+				"default": "r",
+				"example": "",
+				"help" : "Type."
+			}],
+			"description": "Testing purpose environment",
+			"docker_image": "",
+			"author": "regular.express",
+			"title": "Test Select"
+		},
+		"displayName": "TestEnv",
+		"image": [0],
+		"save": {
+			"property": {}
+		},
+		"result": {
+			"properties": {}
+		}
+	})
 
 	$scope.$watch('test', function (oldValue, newValue) {
 		if (!newValue) return;
