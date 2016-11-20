@@ -10,6 +10,8 @@
                     <input ng-keydown="ignoreKeyEvent($event)" ng-model="title"></textarea>
                     <div class="sb_section">Description</div>
                     <textarea ng-model="description"></textarea>
+                    <div class="sb_section">Tag</div>
+                    <md-chips ng-model="tags" readonly="readonly" md-removable="removable" placeholder="Enter a tag" delete-button-label="Remove Tag" delete-hint="Press delete to remove tag" secondary-placeholder="+Tag"></md-chips>
                     <div class="buttons" ng-show="shareStep <= 1">
                         <button ng-click="submitForm($event)">Share</button>
                     </div>

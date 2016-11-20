@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute']);
+var app = angular.module('app', ['ngRoute', 'ngMaterial']);
 const {BrowserWindow, ipcMain} = require('electron').remote;
 
 app.config(function ($routeProvider) {
@@ -340,7 +340,6 @@ app.controller("HistoryController", function ($scope, $rootScope) {
 app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib) {
 	// On selected Env is changed
 	$scope.$watch('selectedEnv', initPropertyData);
-
 	$scope.notice = {
 		closeTick: 5000,
 		timestamp: 0,
@@ -776,6 +775,7 @@ app.directive("sharebox", function ($rootScope) {
 			visible: "="
 		},
 		link: function ($scope) {
+			$scope.tags = [];
 			$scope.shareStep = 0;
 			$scope.shareMsg = '';
 			$scope.shareURL = '';
@@ -785,6 +785,7 @@ app.directive("sharebox", function ($rootScope) {
 				$scope.title = '';
 				$scope.description = '';
 				$scope.shareStep = 0;
+				$scope.tags = [];
 			}
 			$scope.ignoreEvent = function (e) {
 				e.stopPropagation();
@@ -841,6 +842,7 @@ app.directive("sharebox", function ($rootScope) {
 				obj.data = JSON.parse(JSON.stringify(result));
 				obj.data.title = $scope.title;
 				obj.data.description = $scope.description;
+				obj.data.tags = $scope.tags;
 
 				const httpContext = {
 					'headers': {
@@ -853,8 +855,6 @@ app.directive("sharebox", function ($rootScope) {
 				const request = require('request');
 				request({
 					url: 'http://auth.regular.express/share',
-					//url: 'http://ec2-52-78-231-172.ap-northeast-2.compute.amazonaws.com/share',
-					//url: 'http://lab.prev.kr:7777/share',
 					method: 'POST',
 					headers: {
 						"Content-Type": "application/json",

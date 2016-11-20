@@ -44,6 +44,7 @@ nav#lnb .item {
 	overflow: hidden;
 	white-space: nowrap;
 	font-size: 14px;
+	outline: none;
 }
 
 
@@ -80,4 +81,19 @@ nav#lnb .item:hover {
 	overflow-y: auto;
 	height: calc(100% - 62px);
 	background: #eee;
+}
+.md-chips md-chip {
+	border-radius: 32px !important;
+}
+.md-chips.md-focused {
+	box-shadow: 0 1px #11b9b9 !important;
+}
+md-chip.md-focused {
+	background: #11b9b9 !important;
+	color: rgba(255, 255, 255, 0.87) !important;
+}
+
+md-icon {
+	min-width: 14px !important;
+	min-height: 14px !important;
 }
