@@ -2,7 +2,7 @@ app.factory('HistoryLib', function () {
 	const jsonfile = require('jsonfile');
 	const fs = require('fs');
 
-	const base = './history/';
+	const base = require('electron').remote.app.getPath('userData') + '/history/';
 	const histfile = 'history.json';
 
 	if (!fs.existsSync(base))
@@ -33,7 +33,7 @@ app.factory('GitHubToken', function ($rootScope) {
 	const jsonfile = require('jsonfile');
 	const fs = require('fs');
 
-	const base = './cache/';
+	const base = require('electron').remote.app.getPath('userData') + '/cache/';
 
 	if (!fs.existsSync(base))
 		fs.mkdir(base);
@@ -125,7 +125,7 @@ app.factory('CacheLib', function () {
 	const jsonfile = require('jsonfile');
 	const fs = require('fs');
 
-	const base = './cache/';
+	const base = require('electron').remote.app.getPath('userData') + '/cache/';
 
 	if (!fs.existsSync(base))
 		fs.mkdir(base);
