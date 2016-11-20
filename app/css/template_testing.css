@@ -211,7 +211,6 @@ testing-page #properties {
 testing-page #properties tr:nth-of-type(2n+1) > * {
 	background: #f5f5f5;
 }
-
 testing-page #properties th,
 testing-page #properties td {
 	width: 50%;
@@ -220,10 +219,14 @@ testing-page #properties td {
 }
 
 testing-page #properties th {
+	padding-right: 10px;
+}
+
+testing-page #properties th {
 	text-align: right;
 	vertical-align: top;
 	border-right: 2px solid #11b9b9;
-	width: 150px;
+	width: 160px;
 }
 
 testing-page #properties th span {
@@ -256,7 +259,12 @@ testing-page #properties th a.help {
 	line-height: 1rem;
 	text-decoration: none;
 	color: white;
-	background-color: deepskyblue;
+	background-color: #666;
+	padding: 0.5px;
+	border-radius: 100px;
+	font-size: 0.8rem;
+	font-weight: 800;
+	text-rendering: auto;
 	border-radius: 100px;
 }
 
