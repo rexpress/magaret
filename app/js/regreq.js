@@ -58,7 +58,7 @@ function getImageInspect(image, tag, cb) {
   let proc = spawn('docker', ['inspect', `${image}:${tag}`], {
     detached: true,
     windowsVerbatimArguments: true
-  });
+  }).on('error', function( err ){ throw err });;
   var buffer = '';
   var success_flag = true;
   var callback = (r) => {
