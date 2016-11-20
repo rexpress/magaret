@@ -61,12 +61,13 @@ app.run(function ($rootScope, GitHubToken, HistoryLib) {
 				alert('Auth Failed : ' + obj.error);
 			}
 		});
-		let win = new BrowserWindow({width: 800, height: 600, webPreferences: {
+		let win = new BrowserWindow({width: 800, height: 600, autoHideMenuBar: true, webPreferences: {
 			preload: require('path').join(__dirname, 'js/authPreload.js'),
-			partition: 'auth' + Date.now().toString()
+			partition: 'auth' + Date.now().toString(),
+			devTools: true
 		}})
 		
-		win.setMenu(null);
+		//win.setMenu(null);
 		win.loadURL(`https://github.com/login/oauth/authorize?client_id=16756a3f11cc61c1bc5d`)
 	}
 
