@@ -68,6 +68,11 @@ testing-page select {
   color: rgba(0,0,0, 1);
   border: none;
   border-bottom: 1px solid rgba(0,0,0, 0.3);
+	padding: 4px;
+	background: url("data:image/svg+xml;utf8,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%20-500%201500%202000%27%3E%3Cstyle%3Epath{fill:%20#333;stroke:black;stroke-linecap:round;stroke-width:20;}%3C/style%3E%3Cpath%20d=%27M875.7,179.8L500,577.9L124.3,179.8L10,301l490,519.2L990,301L875.7,179.8z%27/%3E%3C/svg%3E") 50% no-repeat;
+  background-position: right;
+	-webkit-appearance: none;
+  border-radius: 0;
 }
 
 /* Remove focus */
