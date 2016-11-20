@@ -405,15 +405,21 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 		if ($scope.selectedEnv.save.inputText)
 			$scope.inputText.this.setValue($scope.selectedEnv.save.inputText);
 		else
-			$scope.inputText.this.setValue('');
+			try {
+				$scope.inputText.this.setValue('');
+			} catch (e) { }
 		if ($scope.selectedEnv.save.outputText)
 			$scope.outputText.this.setValue($scope.selectedEnv.save.outputText);
 		else
-			$scope.outputText.this.setValue('');
+			try {
+				$scope.outputText.this.setValue('');
+			} catch (e) { }
 		if ($scope.selectedEnv.save.debugText)
 			$scope.debugText.this.setValue($scope.selectedEnv.save.debugText);
 		else
-			$scope.debugText.this.setValue('');
+			try {
+				$scope.debugText.this.setValue('');
+			} catch (e) { }
 		
 		if ($scope.selectedEnv.save.resultSet)
 			$scope.resultSet = $scope.selectedEnv.save.resultSet;
@@ -494,7 +500,9 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 
 	$scope.testForm = function () {
 		for (var p in $scope.propertyString) {
-			$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
+			try {
+				$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
+			} catch (e) { }
 		}
 
 		let env = (() => {
@@ -597,7 +605,9 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 					$scope.loadEnv($scope.selectedEnv);
 
 					for (var p in $scope.propertyString) {
-						$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
+						try {
+							$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
+						} catch(e) { }
 					}
 
 					for (let p in $scope.propertyInput) {
