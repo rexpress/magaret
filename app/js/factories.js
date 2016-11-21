@@ -196,13 +196,11 @@ app.factory('Environments', function() {
 						name = name.replaceAll(parent.toLowerCase(), parent);
 						name = name.replaceAll('-', ' ');
 						var name_sp = name.split(' ');
-						name = '';
 						for (let n in name_sp) {
-							if (n > 0 && name_sp[n][0] >= 'a' && name_sp[n][0] <= 'z')
+							if (name_sp[n][0] >= 'a' && name_sp[n][0] <= 'z')
 								name_sp[n] = name_sp[n][0].toUpperCase() + name_sp[n].substr(1);
-							name += name_sp[n] + ' ';
 						}
-						obj[a].children[c].displayName = name;
+						obj[a].children[c].displayName = name_sp.join(" ");
 					}
 					//console.info(obj[a]);
 				}
