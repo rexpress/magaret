@@ -17,7 +17,7 @@
       let ls = spawn('docker', ['run', '--rm', '-i', `${image}`, `${property}`, `${testset}`], {
         detached: true,
         windowsVerbatimArguments: true
-      });
+      }).on('error', function( err ){ throw err });
 
       ls.stdout.on('data', data => {
         buff += data.toString();
@@ -59,7 +59,7 @@
       let ls = spawn('docker', ['pull', `${image}`], {
         detached: true,
         windowsVerbatimArguments: true
-      });
+      }).on('error', function( err ){ throw err });;
 
       ls.stdout.on('data', data => {
         return callback({ type: 'log', data: `${data}` });

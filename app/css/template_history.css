@@ -16,17 +16,35 @@ panel > .right {
 
 panel > .show {
   right: 0px;
-  top: 62px;
-      z-index: 3;
+  top: 100px;
+  z-index: 3;
+  box-shadow: 0px -2px 10px black;
+}
+
+panel > .hist_title {
+  top: 60px;
+  position: absolute;
+  width: 310px;
+  right: -310px;
+  text-align: center;
+  padding: 9px 0 9px 0;
+  background: rgb(17, 185, 185);
+  color: white;
+}
+panel > .hist_title.show {
+  top: 60px;
+  right: 0;
+  z-index: 10;
 }
 
 .history {
   width: 310px;
-  height: calc(100% - 62px);
+  height: calc(100% - 100px);
   display: block;
   overflow-x: hidden;
   overflow-y: scroll;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 1);
+  -webkit-user-select: none;
 }
 
 .history-box {
@@ -47,12 +65,9 @@ panel > .show {
   padding: 0;
   /*margin-top: 16px;*/
   font-size: 13px;
-  text-overflow: ellipsis;
-  width: 80px !important;
 }
 
 .history-box .properties span {
-  border-bottom: 1px solid #ccc;
   padding: 2px 3px;
   overflow: hidden;
 }
@@ -61,6 +76,27 @@ panel > .show {
   display: inline-block;
   color: #444;
   margin-right: 4px;
+  text-overflow: ellipsis;
+  width: 80px !important;
+  vertical-align: top;
+}
+
+.history-box .properties span.key_sub {
+  font-size: 0.8rem;
+}
+
+.history-box .properties span.value {
+  display: inline-block;
+  color: #444;
+  margin-right: 4px;
+  text-overflow: ellipsis;
+  width: 175px;
+}
+
+
+.history-box .properties span.value_empty {
+  color: #aaa;
+  font-style: italic;
 }
 
 .history-box .last {
@@ -71,4 +107,27 @@ panel > .show {
   font-size: 12px;
   color: #999;
   margin-top: 5px;
+}
+
+.history-box content {
+  outline: none;
+  line-height: 1rem;
+}
+
+.history-box .env_title {
+  font-size: 1.1rem;
+  line-height: 1rem;
+}
+
+.history-box .env_image {
+  color: #888;
+  font-size: 0.8rem;
+  margin-left: 3px;
+}
+
+.history-box .env_sep {
+  width: 98%;
+  height: 5px;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 5px;
 }

@@ -16,7 +16,7 @@
 					</div>
 					<ul class="sub-list">
 						<li ng-repeat="envChild in envGroup.children">
-							<div class="item child-item" ng:class="selectedEnv == envChild && 'selected'" ng-click="loadEnv(envChild)">
+							<div class="item child-item" ng:class="selectedEnv.name == envChild.name && 'selected'" ng-click="loadEnv(envChild)">
 								<span class="title">{{ envChild.displayName }}</span>
 							</div>
 						</li>
