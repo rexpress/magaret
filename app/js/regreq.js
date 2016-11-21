@@ -54,39 +54,16 @@ function getRepoManifest(image, tag, cb) {
 }
 
 function getImageInspect(image, tag, cb) {
-  const spawn = require('child_process').spawn;
-  let proc = spawn('docker', ['inspect', `${image}:${tag}`], {
-    detached: true,
-    windowsVerbatimArguments: true
-  }).on('error', function( err ){ throw err });;
-  var buffer = '';
-  var success_flag = true;
-  var callback = (r) => {
-    if (r.type == 'log') {
-      success_flag = false;
-      console.error(r.data);
-      cb(null, { 'error': r.data });
-      return false;
+  const dockerode = require('dockerode');
+  var docker = new dockerode();
+  var image = docker.getImage(`${image}:${tag}`);
+  image.inspect(function (err, data) {
+    if (!err && data)
+      cb(null, data.ContainerConfig.Image);
+    else {
+      console.error(err);
+      cb(null, { 'error': err });
     }
-    if (!success_flag) return false;
-    
-    try {
-      var obj = JSON.parse(r.data);
-      //console.info('getImageInspect> ' + obj[0].ContainerConfig.Image);
-      cb(null, obj[0].ContainerConfig.Image);
-    } catch(e) { }
-  }
-
-  proc.stdout.on('data', data => {
-    buffer += data.toString();
-  });
-
-  proc.stderr.on('data', data => {
-    return callback({ type: 'log', data: `${data}` });
-  });
-
-  proc.on('close', data => {
-    return callback({ type: 'end', data: `${buffer}` });
   });
 }
 
