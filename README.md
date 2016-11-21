@@ -1,16 +1,18 @@
 ### Magaret is electron and docker based regular expression tester.
 [Official Site](https://regular.express)
 
-
 Requirement
 ===========
 - Node 6.x
 - Docker
 - Git
 
+Prebuilt-Image Install
+======================
+https://github.com/rexpress/magaret/releases
+
 Manually Install and Update
 ===========================
-
 **Clone repository**
 ```{r, engine='bash'}
 $ git clone https://github.com/rexpress/magaret.git
