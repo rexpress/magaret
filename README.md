@@ -1,10 +1,13 @@
+### Magaret is electron and docker based regular expression tester.
+
 Requirement
 ===========
-- Node 5.xx or later
+- Node 6.x
+- Docker
 - Git
 
-Install and Run
-===============
+Manually Install and Update
+===========================
 
 **Clone repository**
 ```{r, engine='bash'}
