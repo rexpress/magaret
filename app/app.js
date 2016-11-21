@@ -179,7 +179,7 @@ app.on('ready', () => {
 		win = null;
 	});
 
-	win.webContents.openDevTools();
+	//win.webContents.openDevTools();
 	// Or load a local HTML file
 	win.loadURL(`file://${__dirname}/index.html`)
 });
