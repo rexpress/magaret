@@ -638,6 +638,7 @@ app.directive('codeMirror', ['$timeout', function ($timeout) {
 				lineNumbers: showLineNumbers,
 				mode: scope.syntax || 'javascript',
 				matchBrackets: true,
+				smartIndent: false,
 				theme: scope.theme || 'default',
 				value: scope.content || '',
 				lineWrapping: scope.lineWrapping === 'true' ? true : false,
