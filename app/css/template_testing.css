@@ -157,7 +157,7 @@ testing-page section > textarea{
 }
 
 testing-page section title {
-	margin: 15px 0 0px 18px;
+	margin: 22px 0 0px 18px;
 	color: #555;
 	font-size: 26px;
 	font-weight: 300;
@@ -168,6 +168,13 @@ testing-page section title {
 testing-page content {
 	background: white;
 	display: block;
+}
+
+testing-page #adv_mode {
+	display: flex;
+	float: right;
+	margin-right: 10px;
+	margin-top: -25px;
 }
 
 testing-page #property table {
@@ -195,6 +202,10 @@ testing-page #property .CodeMirror {
 	background: transparent;
 	border-bottom: 1px solid #aaa;
 	padding: 0px;
+}
+
+testing-page #property .CodeMirror.CodeMirror-focused {
+	border-bottom: 1px solid #11b9b9;
 }
 
 testing-page #property .CodeMirror pre {

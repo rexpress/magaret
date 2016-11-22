@@ -15,9 +15,13 @@
       const dockerode = require('dockerode');
       var dd = new dockerode();
       var buff = '';
+      var cont = {};
       dd.run(image, [property, testset], process.stdout, {
         Tty: false
-      }, function (err, data, container) {}).on('stream', function (stream) {
+      }, function (err, data, container) {
+        console.log(container);
+        this.cont = container;
+      }).on('stream', function (stream) {
         stream.on('data', function (chunk) {
           var chunk_str = chunk.toString();
           buff += chunk_str;
@@ -31,6 +35,11 @@
           return callback({ type: 'log', data: `${data}` });
         });
         stream.on('end', function () {
+          console.log(this.cont);
+          /*this.cont.remove(function (err, data) {
+            console.warn(err);
+            console.log(data);
+          });*/
           return callback({ type: 'end' });
         });
       });
@@ -44,12 +53,38 @@
     dataExtract: data => {
       let a = data.substr(data.search(docker.st)+docker.st.length);
       a = a.substr(0, a.search(docker.ed)).trim();
+      console.log(a);
       try {
-        data = JSON.parse(a)
+        data = JSON.parse(a);
       }
-      catch(e) { 
-        console.warn(`dataExtract: ${e.message}`);
-        return;
+      catch(e) {
+        console.warn('err');
+        console.log(a[180].charCodeAt());
+
+        // stream bug fix (hardcoded)
+        if (a[0] != '{') a = a.substr(a.search('{'));
+        a = a.replace(/\x00/gi, '');
+        a = a.replace(/\x01/gi, '');
+        a = a.replace(/\x01/gi, '');
+        a = a.replace(/\x02/gi, '');
+        a = a.replace(/\x03/gi, '');
+        a = a.replace(/\x04/gi, '');
+        a = a.replace(/\x05/gi, '');
+        a = a.replace(/\x06/gi, '');
+        a = a.replace(/\x07/gi, '');
+        a = a.replace(/\x08/gi, '');
+        a = a.replace(/\x09/gi, '');
+        a = a.replace(/\x0F/gi, '');
+        a = a.replace(/\x15/gi, '');
+        console.info(Buffer(a));
+        console.log(a);
+        try {
+          data = JSON.parse(a);
+        }
+        catch(e) {
+          console.warn(`dataExtract: ${e.message}`);
+          return;
+        }
       }
       return { type: 'result', data: data };
     },
