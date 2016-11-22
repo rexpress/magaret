@@ -124,13 +124,13 @@
 		</content>
 	</section>
 	{{ envValue.field.debug }}
-	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="output" ng-show="!!envValue.input.getValue()">
+	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="output" ng-show="!!resultSet.type">
 		<title>output</title>
 		<content>
 			<code-mirror container="envValue.field['output']" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
 		</content>
 	</section>
-	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="debug" ng-show="!!envValue.debug.getValue()">
+	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="debug" ng-show="!!resultSet.type">
 		<title>debug</title>
 		<content>
 			<code-mirror container="envValue.field['debug']" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>

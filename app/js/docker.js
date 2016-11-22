@@ -53,14 +53,10 @@
     dataExtract: data => {
       let a = data.substr(data.search(docker.st)+docker.st.length);
       a = a.substr(0, a.search(docker.ed)).trim();
-      console.log(a);
       try {
         data = JSON.parse(a);
       }
       catch(e) {
-        console.warn('err');
-        console.log(a[180].charCodeAt());
-
         // stream bug fix (hardcoded)
         if (a[0] != '{') a = a.substr(a.search('{'));
         a = a.replace(/\x00/gi, '');
@@ -76,8 +72,6 @@
         a = a.replace(/\x09/gi, '');
         a = a.replace(/\x0F/gi, '');
         a = a.replace(/\x15/gi, '');
-        console.info(Buffer(a));
-        console.log(a);
         try {
           data = JSON.parse(a);
         }
