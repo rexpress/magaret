@@ -56,7 +56,7 @@
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
 
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
-
+	<script type="text/javascript" src="https://cdn.rawgit.com/Luegg/angularjs-scroll-glue/master/src/scrollglue.js"></script>
 	<script type="text/javascript" src="js/site.js"></script>
 	<script type="text/javascript" src="js/docker.js"></script>
 	<script type="text/javascript" src="js/factories.js"></script>
@@ -111,6 +111,31 @@
 		<menu-item hash="third-page">Third Page</menu-item>
 	</menu>
 	<section id="content" ng-view></section>
+	<div class="ctmsg_wrapper" ng-show="magaret_phase">
+		<div class="ctmsg_dimmed" ng-switch="magaret_phase">
+			<div class="ctmsg_box_loading" ng-switch-when="1">
+				<h1>regular.express loading...</h1>
+				<div class="showbox">
+						<div id="loader" class="loader">
+						<svg class="circular" viewBox="25 25 50 50">
+								<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+						</svg>
+						</div>
+				</div>
+			</div>
+			<div class="ctmsg_box_request" ng-switch-when="2">
+				<h1>Docker requesting...</h1>
+				<textarea id="magaret_loadstr" ng-model="magaret_loadstr"></textarea>
+				<div class="showbox">
+						<div id="loader" class="loader">
+						<svg class="circular" viewBox="25 25 50 50">
+								<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+						</svg>
+						</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>

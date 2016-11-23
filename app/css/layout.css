@@ -138,3 +138,137 @@ menu {
 	padding: 0;
 	margin: 0;
 }
+
+.ctmsg_wrapper {
+	display: table;
+	height: 100%;
+	width:100%;
+	top: 0;
+	left: 0;
+	position: absolute;
+	z-index: 10;
+	user-select: none;
+}
+
+.ctmsg_dimmed {
+	display: table-cell;
+	vertical-align:middle;
+	background: rgba(0,0,0,0.5);
+}
+
+.ctmsg_wrapper h1 {
+	font-weight: 500;
+  color: white;
+}
+
+.ctmsg_box_loading {
+	max-width: 600px;
+	height: 200px;
+	padding: 10px;
+	background: rgba(0,0,0,0.5);
+	margin:0 auto;
+	text-align: center;
+	/* font-weight: 100; */
+	border-radius: 5px;
+	border: 4px solid white;
+	-webkit-user-select: none;
+}
+
+.ctmsg_box_request {
+	max-width: 600px;
+	height: 380px;
+	padding: 10px;
+	background: rgba(0,0,0,0.5);
+	margin:0 auto;
+	text-align: center;
+	/* font-weight: 100; */
+	border-radius: 5px;
+	border: 4px solid white;
+	-webkit-user-select: none;
+}
+.ctmsg_box_request textarea {
+	width: 90%;
+	height: 140px;
+	margin-bottom: 15px;
+	background: transparent;
+	border: 2px solid white;
+	border-radius: 3px;
+	padding: 10px;
+	font-size: 1.5rem;
+	font-weight: 400;
+	color: white;
+	font-family: monospace;
+}
+
+/* Modern Google Loader in Pure CSS */
+/* https://gist.github.com/CodeMyUI/3c3a57a17cb56828356a */
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
+.loader {
+  position: relative;
+  margin: 0px auto;
+  width: 100px;
+  height: 100px;
+  zoom: 1;
+}
+
+.circular {
+  animation: rotate 2s linear infinite;
+  height: 100px;
+  position: relative;
+  width: 100px;
+}
+
+.path {
+  stroke-dasharray: 1,200;
+  stroke-dashoffset: 0;
+  animation:
+    dash 1.5s ease-in-out infinite,
+    color 6s ease-in-out infinite;
+  stroke-linecap: round;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1,200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -124;
+  }
+}
+
+@keyframes color{
+  100%, 0% {
+    stroke: #d62d20;
+  }
+
+  40% {
+    stroke: #0057e7;
+  }
+
+  66% {
+    stroke: #008744;
+  }
+
+  80%, 90% {
+    stroke: #ffa700;
+  }
+}

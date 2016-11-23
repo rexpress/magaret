@@ -157,7 +157,7 @@ testing-page section > textarea{
 }
 
 testing-page section title {
-	margin: 15px 0 0px 18px;
+	margin: 22px 0 0px 18px;
 	color: #555;
 	font-size: 26px;
 	font-weight: 300;
@@ -168,6 +168,13 @@ testing-page section title {
 testing-page content {
 	background: white;
 	display: block;
+}
+
+testing-page #adv_mode {
+	display: flex;
+	float: right;
+	margin-right: 10px;
+	margin-top: -25px;
 }
 
 testing-page #property table {
@@ -195,6 +202,10 @@ testing-page #property .CodeMirror {
 	background: transparent;
 	border-bottom: 1px solid #aaa;
 	padding: 0px;
+}
+
+testing-page #property .CodeMirror.CodeMirror-focused {
+	border-bottom: 1px solid #11b9b9;
 }
 
 testing-page #property .CodeMirror pre {
@@ -244,9 +255,15 @@ testing-page #properties th span:before {
 	display: inline-block;
 }
 
-testing-page #properties th span.required:before {
+testing-page #properties th span.important:before {
 	content: '*';
 	color: red;
+	margin-right: 0.5rem;
+}
+
+testing-page #properties th span.required:before {
+	content: '*';
+	color: blue;
 	margin-right: 0.5rem;
 }
 
@@ -404,8 +421,8 @@ table.result-table {
 }
 
 .result-table .bool-true {
-	background: #11b9b9 !important;
-  color: white !important;
+	background: #e3e8e8 !important;
+  color: #004848 !important;
 }
 
 .overflow-x-auto {
@@ -598,77 +615,4 @@ table.result-table {
 	border-radius: 0.2em;
 	margin-top: 15px;
 	padding: 0px 8px 10px 8px;
-}
-
-/* Modern Google Loader in Pure CSS */
-/* https://gist.github.com/CodeMyUI/3c3a57a17cb56828356a */
-.centered {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  /* bring your own prefixes */
-  transform: translate(-50%, -50%);
-}
-
-.loader {
-  position: relative;
-  margin: 0px auto;
-  width: 100px;
-  height: 100px;
-  zoom: 1;
-}
-
-.circular {
-  animation: rotate 2s linear infinite;
-  height: 100px;
-  position: relative;
-  width: 100px;
-}
-
-.path {
-  stroke-dasharray: 1,200;
-  stroke-dashoffset: 0;
-  animation:
-    dash 1.5s ease-in-out infinite,
-    color 6s ease-in-out infinite;
-  stroke-linecap: round;
-}
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1,200;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 89,200;
-    stroke-dashoffset: -35;
-  }
-  100% {
-    stroke-dasharray: 89,200;
-    stroke-dashoffset: -124;
-  }
-}
-
-@keyframes color{
-  100%, 0% {
-    stroke: #d62d20;
-  }
-
-  40% {
-    stroke: #0057e7;
-  }
-
-  66% {
-    stroke: #008744;
-  }
-
-  80%, 90% {
-    stroke: #ffa700;
-  }
 }

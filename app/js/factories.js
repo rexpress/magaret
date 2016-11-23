@@ -121,6 +121,34 @@ app.factory('GitHubToken', function ($rootScope) {
 	}
 })
 
+app.factory('ConfigLib', function ($rootScope) {
+	const jsonfile = require('jsonfile');
+	const fs = require('fs');
+
+	const base = require('electron').remote.app.getPath('userData') + '/cache/';
+
+	if (!fs.existsSync(base))
+		fs.mkdir(base);
+
+	function getFilePath() {
+		return base + 'config.json';
+	}
+	return {
+		'save': function(res) {
+			jsonfile.writeFileSync(getFilePath(), res);
+		},
+		'load': function() {
+			try {
+				var content = jsonfile.readFileSync( getFilePath() );
+				return content;
+
+			}catch(error) {
+				return null
+			}
+		},
+	}
+})
+
 app.factory('CacheLib', function () {
 	const jsonfile = require('jsonfile');
 	const fs = require('fs');

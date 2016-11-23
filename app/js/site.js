@@ -23,6 +23,20 @@ app.run(function ($rootScope, GitHubToken, HistoryLib) {
 	$rootScope.scopeObj = null;
 	$rootScope.imageInfo = {};
 	$rootScope.historyContent = HistoryLib.read();
+	$rootScope.magaret_phase = 1;
+	$rootScope.magaret_loadstr = '';
+	$rootScope.addLoadStr = (str) => {
+		if ($rootScope.magaret_loadstr)
+			$rootScope.magaret_loadstr += '\n';
+		$rootScope.magaret_loadstr += str;
+		if (typeof magaret_loadstr !== 'undefined') {
+			magaret_loadstr.value = $rootScope.magaret_loadstr;
+			magaret_loadstr.scrollTop = magaret_loadstr.scrollHeight;
+		}
+	}
+	$rootScope.clearLoadStr = (str) => {
+		$rootScope.magaret_loadstr = '';
+	}
 
 	$rootScope.$on('$routeChangeStart', function (event, next) {
 		$rootScope.currentRoute = next;
@@ -105,7 +119,7 @@ app.run(function ($rootScope, GitHubToken, HistoryLib) {
 	}
 });
 
-app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib, GitHubToken) {
+app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib, GitHubToken, ConfigLib) {
 	var envInfo = CacheLib.read('envInfo');
 
 	$rootScope.scopeObj = $scope;
@@ -130,6 +144,7 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 		}
 
 		Environments.load(function (result) {
+			const async = require('async');
 			$scope.envInfo = result;
 			CacheLib.write('envInfo', result);
 
@@ -142,77 +157,180 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 			for (let arr of array) {
 				$rootScope.imageInfo[arr] = [0];
 			}
-			for (let arr of array) {
-				/*if (!arr.search(':'))
-					continue;
-				let s = arr.split(':');
-				getImageInspect(s[0], s[1], (ph, result) => {
-					console.log(`${arr} ${result}`);
-				})*/
+
+			async.each(array, function (arr, callback) {
 				testImage(arr, (result) => {
-					// 0 : installed
-					// 1 : not installed
-					// 2 : need update
 					$rootScope.imageInfo[arr][0] = 0;
 					if (!result[1])
 						$rootScope.imageInfo[arr][0] = 1;
 					else if (result[0] != result[1])
 						$rootScope.imageInfo[arr][0] = 2;
-				});
-
-
-				for (let p in $scope.envInfo)
+					
+					callback();
+				})
+			},
+			// done
+			function (err) {
+				for (let p in $scope.envInfo) {
 					for (let c in $scope.envInfo[p].children) {
 						$scope.envInfo[p].children[c].image = $rootScope.imageInfo[$scope.envInfo[p].children[c].info.docker_image];
 					}
-			}
-			$scope.$apply();
+				}
+				$rootScope.magaret_phase = 0;
+				$scope.$apply();
+			});
 		});
 	}
 
+	var config = ConfigLib.load();
+	if (!config)
+		$scope.advMode = true;
+	else
+		$scope.advMode = config.advMode;
 	$scope.selectedEnv = null;
-
+	
 	// initialize resultSet object
 	$scope.resultSet = {};
 
-	var loadEnv = function (env, isHistory) {
-		if (isHistory)
-			$scope.selectedEnv.isHistory = true;
-			
-		if ($scope.selectedEnv && $scope.selectedEnv.name != env.name) { 
-			$scope.selectedEnv.save.inputText = $scope.inputText.this.getValue();
-			$scope.selectedEnv.save.outputText = $scope.outputText.this.getValue();
-			$scope.selectedEnv.save.debugText = $scope.debugText.this.getValue();
-
-			// save to resultSet
-			$scope.selectedEnv.save.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
-
-			// process to property string
-			for (var p in $scope.propertyString) {
-				try {
-					$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
-				} catch (e) { }
-			}
-
-			for (let p in $scope.propertyInput) {
-				try {
-					$scope.selectedEnv.save.property[p] = JSON.parse(JSON.stringify($scope.propertyInput[p]));
-				} catch (e) { }
+	var loadHistory = function (history) {
+		let env;
+		for (let p in $scope.envInfo) {
+			for (let c in $scope.envInfo[p].children) {
+				if ($scope.envInfo[p].children[c].name == history.name) {
+					env = $scope.envInfo[p].children[c]; 
+				}
 			}
 		}
-/*
-		if (!isHistory && $scope.selectedEnv)
-			return false;
-*/
-console.log($rootScope.scopeObj.propertyInput);
-		if ($scope.selectedEnv && env.name == $scope.selectedEnv.name) {
-			for (let p in $scope.propertyString) {
-				try {
-					console.log($scope.propertyString[p].this.setValue(Date.now().toString()));
-				} catch(e) { }
-			}
+		if (!env) {
+			console.error("can't load history");
+			return;
 		}
 
+		loadEnv(env);
+		//$scope.selectedEnv = env;
+		//setEnvCollection(env);
+		
+		// restore value
+		for (let p in history.result.properties) {
+			$scope.envValue.properties[p]._value = history.result.properties[p].value; 
+			$scope.envValue.properties[p].setValue(history.result.properties[p].value);
+		}
+
+		console.error('history:');
+		console.error(history);
+
+		console.info(history.result['input'].join('\n'));
+		$scope.envValue.field['input']._value = history.result['input'].join('\n');
+		$scope.envValue.field['input'].setValue($scope.envValue.field['input']._value);
+
+		if (history.result['output'])
+			$scope.envValue.field['output']._value = JSON.stringify(history.result['output']);
+		else
+			$scope.envValue.field['output']._value = '';
+		$scope.envValue.field['output'].setValue($scope.envValue.field['output']._value);
+
+		if (history.result['output'] && history.result['output'].debugOutput)
+			$scope.envValue.field['debug']._value = history.result['output'].debugOutput;
+		else
+			$scope.envValue.field['debug']._value = '';
+		$scope.envValue.field['debug'].setValue($scope.envValue.field['debug']._value);
+
+		$scope.envValue.resultSet = JSON.parse(JSON.stringify(history.result.resultSet));
+
+		console.log('loadHistory -- ');
+
+	}
+
+	$scope.loadHistory = loadHistory;
+
+	var setEnvCollection = function (env) {
+		if (!$scope.fieldInfo) {
+			$scope.fieldInfo = {};
+			for (let i of ['input', 'output', 'debug']) {
+					$scope.fieldInfo[i] = {
+						_value: '',
+						getValue: function () {
+							return this._value;
+						},
+						setValue: function (val) {
+							this._value = val;
+						}
+					}
+				}
+		}
+
+		// create envCollection
+		if (!$scope.envCollection[env.name]) {
+			console.info(`Create envCollection: ${env.name}`);
+			$scope.envValue = {
+				properties: {},
+				field: {},
+				resultSet: {}
+			};
+
+			// reference to fieldInfo
+			for (let i of ['input', 'output', 'debug']) {
+				$scope.envValue.field[i] = {
+					getValue: function () {
+						return $scope.fieldInfo[i].getValue();
+					},
+					setValue: function (val) {
+						return $scope.fieldInfo[i].setValue(val);
+					},
+					save: {}
+				}
+			}
+
+			console.info($scope.envValue);
+
+			for (let item of ['input', 'output', 'debug']) {
+				$scope.envValue.field[item].save = '';
+				$scope.envValue.field[item].setValue('');
+			};
+
+			for (let item of env.info.properties) {
+
+				switch(item.type) {
+					case 'string':
+					case 'number':
+					case 'boolean':
+					case 'list':
+					case 'hidden':
+						$scope.envValue.properties[item.name] = { };
+						$scope.envValue.properties[item.name] = {
+							type: item.type,
+							example: item.example || '',
+							required: item.required,
+							important: item.important,
+							default: item.default || item.value || item.example,
+							_value: item.default || item.value ||item.example || '',
+							getValue: function() {
+								return this._value;
+							},
+							setValue: function(val) {
+								this._value = val;
+							}
+						}
+					break;
+				}
+			}
+			$scope.envCollection[env.name] = $scope.envValue;
+		}
+		else $scope.envValue = $scope.envCollection[env.name];
+	}
+
+	var loadEnv = function (env) {
+		let oldEnv = $scope.selectedEnv;
+		console.warn($scope.envCollection);
+
+		if ($scope.envValue) {
+			console.log($scope.envValue.field.input.getValue());
+			$scope.envValue.field.input.save = $scope.envValue.field.input.getValue();
+			$scope.envValue.field.output.save = $scope.envValue.field.output.getValue();
+			$scope.envValue.field.debug.save = $scope.envValue.field.debug.getValue();
+			console.warn($scope.envValue);
+		}
+		
 		console.info(env);
 		if (env.save == undefined) {
 			env.save = {};
@@ -221,50 +339,54 @@ console.log($rootScope.scopeObj.propertyInput);
 			env.result.properties = {};
 		}
 		var isFound = false;
-		// restore history property and input/output
-		if (isHistory) {
-			$scope.selectedEnv = null;
-			for (let p in $scope.envInfo) {
-				for (let c in $scope.envInfo[p].children) {
-					if (isFound) break;
-					if ($scope.envInfo[p].children[c].name == env.name) {
-						if (!$scope.envInfo[p].children[c].save)
-							$scope.envInfo[p].children[c].save = {};
-						console.log(env.result.output.debugOutput);
-						$scope.envInfo[p].children[c].save.inputText = JSON.parse(JSON.stringify(env.result.input.join('\n')));
-						$scope.envInfo[p].children[c].save.outputText = JSON.stringify(env.result.output);
-						$scope.envInfo[p].children[c].save.debugText = env.result.output.debugOutput;
-						$scope.envInfo[p].children[c].save.resultSet = JSON.parse(JSON.stringify(env.result.resultSet));
-						$scope.envInfo[p].children[c].save.property = JSON.parse(JSON.stringify(env.result.properties));
-						console.log($scope.envInfo[p].children[c].save.property);
-						$scope.resultSet = $scope.envInfo[p].children[c].save.resultSet;
-						$scope.selectedEnv = $scope.envInfo[p].children[c];
-						$scope.propertyInput = env.result.properties;
-						
-						$rootScope.initPropertyData();
-						console.log($scope.propertyInput);
-						console.log($scope.propertyString);
-						isFound = true;
-					}
+		$scope.selectedEnv = env;
+		console.warn($scope.envCollection);
+
+		setEnvCollection(env);
+
+		// All Properties and Input check, all empty, fill to default value
+		var checkIsAllEmpty = () => {
+			for (let p in $scope.envValue.properties) {
+				if ($scope.envValue.properties[p].getValue()) {
+					return false;
 				}
 			}
-			if (!isFound) {
-				$scope.selectedEnv = env;
+			for (let i of ['input', 'output', 'debug']) {
+				if ($scope.envValue.field[i].getValue()) {
+					return false;
+				}
 			}
-		} else $scope.selectedEnv = env;
+			return true;
+		}
 
+		if (checkIsAllEmpty()) {
+			for (let p in $scope.envValue.properties) {
+				scope.envValue.properties[p]._value = $scope.envValue.properties[p].default;
+				scope.envValue.properties[p].setValue($scope.envValue.properties[p].default);
+				return false;
+			}
+		}
+		console.log($scope.envValue);
+		//console.warn($scope.envValue);
 		// assignment to property value
-		if (!$scope.propertyInput) $scope.propertyInput = {};
-		if (!$scope.propertyString) $scope.propertyString = {};
+		$scope.propertyInput = {};
+		$scope.propertyString = {};
 		for (let item of env.info.properties) {
 			if (item.type == 'string')
 				$scope.propertyString[item.name] = {
 					content: ''
 				};
 		}
+
+		// assignment to save value
+		for (let i of ['input', 'output', 'debug']) {
+				$scope.envValue.field[i].setValue($scope.envValue.field[i].save);
+		}
 	};
 
 	$scope.loadEnv = loadEnv;
+	$scope.envCollection = {};
+	console.log($scope.envCollection);
 
 	$scope.$watch('test', function (oldValue, newValue) {
 		if (!newValue) return;
@@ -289,9 +411,10 @@ app.controller("HistoryController", function ($scope, $rootScope) {
 
 
 
-app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib) {
+app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib, ConfigLib) {
 	// On selected Env is changed
 	$rootScope.initPropertyData = initPropertyData;
+	$scope.one = 1;
 	$scope.$watch('selectedEnv', initPropertyData);
 	$scope.notice = {
 		closeTick: 5000,
@@ -337,26 +460,16 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 	function initPropertyData(hardReset) {
 		console.info('called initPropertyData function');
 		if (!$scope.selectedEnv) return;
-		console.log($scope.propertyString);
 
-		var isHistory = $scope.selectedEnv.isHistory;
-		if (isHistory) $scope.selectedEnv.isHistory = null;
-
-		for (var prop of $scope.selectedEnv.info.properties) {
-			for (let p in $scope.selectedEnv.info.properties) {
-					if ($scope.selectedEnv.info.properties[p].name == prop.name) {
-						$scope.selectedEnv.info.properties[p].content = $scope.selectedEnv.info.properties[p].example;
-						if ($scope.selectedEnv.save.property[prop.name])
-							$scope.selectedEnv.info.properties[p].content = $scope.selectedEnv.save.property[prop.name];
-					}
+		// Press Reset Button
+		if (hardReset == true) {
+			for (let el of ['input', 'output', 'debug']) {
+				$scope.envValue.field[el].setValue('');
 			}
-
-			if (prop.value)
-				$scope.propertyInput[prop.name] = prop.value;
-			else if (prop.default !== undefined)
-				$scope.propertyInput[prop.name] = prop.default;
-			else // example placeholder
-				$scope.propertyInput[prop.name] = prop.example;
+			for (let p in $scope.envValue.properties) {
+				$scope.envValue.properties[p].setValue('');
+			}
+			return;
 		}
 
 		if ($scope.selectedEnv.save.inputText)
@@ -371,7 +484,7 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 			$scope.debugText.this.setValue($scope.selectedEnv.save.debugText);
 		else if ($scope.debugText.this)
 				$scope.debugText.this.setValue('');
-
+/*
 		if (!isHistory) {
 			if ($scope.selectedEnv.save.resultSet)
 				$scope.resultSet = $scope.selectedEnv.save.resultSet;
@@ -380,7 +493,7 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 		} else {
 			$scope.resultSet = $scope.selectedEnv.save.resultSet;
 		}
-
+*/
 		$scope.testSetInput = "";
 		$scope.jsonResultSet = null;
 		$scope.testResultSet = null;
@@ -418,16 +531,34 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 				image: $scope.selectedEnv.info.docker_image,
 			}
 		})();
+
+		var redirected = (!!$rootScope.magaret_phase);
+
+		if (!redirected) {
+			$rootScope.magaret_phase = 2;
+			$rootScope.clearLoadStr();
+		}
+		$rootScope.addLoadStr('pull image ' + env.image);
+		
+		if (redirected) {
+			$scope.$apply();
+		}
+
 		async.waterfall([
 			function (callback) {
 				mg_docker.pull(env.image, d => {
 					switch (d.type) {
 						case 'log':
+							$rootScope.addLoadStr(d.data);
 							$scope.notice.info(d.data, 8000);
+						break;
+						case 'error':
+							$rootScope.magaret_phase = 0;
+							$scope.notice.err(d.data, 8000);
 						break;
 						default:
 						console.info(d.data);
-							if (d.data == 0)
+							//if (d.data == 0) // 0 == normally terminated
 								callback(null);
 						break;
 					}
@@ -441,161 +572,215 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 					else if (result[0] != result[1])
 						$scope.selectedEnv.image[0] = 2;
 					
+					
 					if (!$scope.selectedEnv.image[0]) {
-						$scope.$apply();
 						callback(null);
+					} else {
+						$scope.notice.err('docker pull failed', 8000);
+						$rootScope.magaret_phase = 0;
+						$scope.$apply();
 					}
 				});
 			},
 			function (callback) {
-				$scope.testForm();
+				$scope.testForm(null, true); // redirected
 			}
 		])
 	}
 
-	$scope.testForm = function () {
-		for (var p in $scope.propertyString) {
-			try {
-				$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
-				//console.log(`${p}: ${$scope.propertyInput[p]}`)
-			} catch (e) { }
+	$scope.saveAdvMode = function (e) {
+		ConfigLib.save({'advMode': $scope.advMode});
+	}
+
+	$scope.testForm = function (e, redirected) {
+		const async = require('async');
+
+		if (!$rootScope.magaret_phase) {
+			$rootScope.magaret_phase = 2;
+			$rootScope.clearLoadStr();
 		}
 
 		let env = (() => {
 			return {
 				image: $scope.selectedEnv.info.docker_image,
-				property: $scope.propertyInput,
-				testset: $scope.inputText.this.getValue().split('\n'),
+				property: {},
+				testset: $scope.envValue.field.input.getValue().split('\n'),
 			}
 		})();
 
-		let initField = (() => {
-			$scope.outputText.this.getDoc().setValue('');
-			$scope.debugText.this.getDoc().setValue('');
-			$scope.resultSet = null;
-		})();
+    let s = env.image.split(':');
+    let image = s[0];
+    let tag = s[1];
+		async.waterfall([
+			function (callback) {
+				// check if exist image
+				getImageInspect(image, tag, (ph, result) => {
+					if (typeof result != 'string') {
+						if (redirected) {
+							$rootScope.magaret_phase = 0;
+							$scope.$apply();
+							return $scope.notice.err('docker pull failed #2', 8000);
+						}
+						else return $scope.updateForm();
+					}
+					callback(null);
+				});
+			},
+			function (callback) {
+				$rootScope.addLoadStr('Request Docker.');
+				for (var p in $scope.propertyString) {
+					try {
+						$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
+						//console.log(`${p}: ${$scope.propertyInput[p]}`)
+					} catch (e) { }
+				}
 
-		let resultGenerate = (data => {
-			var resultSet = {};
-			resultSet.list = [];
-			if (data.exception)
-				resultSet.exception = data.exception;
-			// i = res_num
-			// j = case_num
-			// k = max_column
-			// l = alphabet
-			// m = max
-			let i = 0, j = 0, k = 1, l = 65, m = 0;
-			switch (data.type) {
-				case 'GROUP':
-					{
-						resultSet.type = 'group';
-						resultSet.columns = data.result.columns;
+				console.log(env.testset);
+				console.log($scope.envValue.properties);
+				for (let p in $scope.envValue.properties) {
+					env.property[p] = $scope.envValue.properties[p].getValue();	
+				}
 
-						for (let a in data.result.resultList) {
-							++i;
+				let initField = (() => {
+					$scope.envValue.field.output.setValue('');
+					$scope.envValue.field.debug.setValue('');
+					$scope.envValue.resultSet = null;
+				})();
 
-							if (data.result.resultList[a] === null) {
-								resultSet.list.push([i, null]);
-								continue;
+				let resultGenerate = (data => {
+					var resultSet = {};
+					resultSet.list = [];
+					if (data.exception)
+						resultSet.exception = data.exception;
+					// i = res_num
+					// j = case_num
+					// k = max_column
+					// l = alphabet
+					// m = max
+					let i = 0, j = 0, k = 1, l = 65, m = 0;
+					switch (data.type) {
+						case 'GROUP':
+							{
+								resultSet.type = 'group';
+								resultSet.columns = data.result.columns;
+
+								for (let a in data.result.resultList) {
+									++i;
+
+									if (data.result.resultList[a] === null) {
+										resultSet.list.push([i, null]);
+										continue;
+									}
+
+									j = 0;
+
+									for (let res of data.result.resultList[a].list) {
+										resultSet.list.push([(j++ ? ' ' : i), res]);
+										if (res.length > k) k = res.length;
+									}
+								}
+
+								if (!resultSet.columns || !resultSet.columns.length) {
+									resultSet.columns = [];
+									for (let i = 0; i < k; i++)
+										resultSet.columns.push(String.fromCharCode(l++));
+								}
 							}
-
-							j = 0;
-
-							for (let res of data.result.resultList[a].list) {
-								resultSet.list.push([(j++ ? ' ' : i), res]);
-								if (res.length > k) k = res.length;
+							break;
+						case 'STRING':
+							{
+								resultSet.type = 'string';
+								let i = 0;
+								for (res of data.result.resultList) {
+									resultSet.list.push([env.testset[i++], res]);
+								}
+								resultSet.columns = ['INPUT', 'RESULT'];
 							}
-						}
-
-						if (!resultSet.columns.length) {
-							resultSet.columns = [];
-							for (let i = 0; i < k; i++)
-								resultSet.columns.push(String.fromCharCode(l++));
-						}
+							break;
+						case 'MATCH':
+							{
+								resultSet.type = 'match';
+								for (res of data.result.resultList) {
+									resultSet.list.push([env.testset[i++], res]);
+								}
+								resultSet.columns = ['STRING', 'BOOLEAN'];
+								break;
+							}
+						default:
+							return resultSet;
 					}
-					break;
-				case 'STRING':
-					{
-						resultSet.type = 'string';
-						let i = 0;
-						for (res of data.result.resultList) {
-							resultSet.list.push([env.testset[i++], res]);
-						}
-						resultSet.columns = ['INPUT', 'RESULT'];
-					}
-					break;
-				case 'MATCH':
-					{
-						resultSet.type = 'match';
-						for (res of data.result.resultList) {
-							resultSet.list.push([env.testset[i++], res]);
-						}
-						resultSet.columns = ['STRING', 'BOOLEAN'];
-						break;
-					}
-				default:
 					return resultSet;
-			}
-			return resultSet;
-		});
-/*
-		console.info(env);
-		var history = HistoryLib.read();
-		if (!history) history = [{}];
-		else history = history.data;
+				});
+		/*
+				console.info(env);
+				var history = HistoryLib.read();
+				if (!history) history = [{}];
+				else history = history.data;
 
-		history = history.push(env);
-*/
-		mg_docker.exec(env.image, env.property, env.testset, d => {
-			switch (d.type) {
-				case 'result':
-					$scope.resultSet = resultGenerate(d.data);
-					$rootScope.scopeObj.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
-					$scope.outputText.this.getDoc().setValue(JSON.stringify(d.data));
-					if (d.data.debugOutput) $scope.debugText.this.getDoc().setValue(String(d.data.debugOutput).trim());
-					if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 15000);
-					$scope.$apply();
+				history = history.push(env);
+		*/
+				mg_docker.exec(env.image, env.property, env.testset, d => {
+					switch (d.type) {
+						case 'result':
+							// generate and print resultset
+							$scope.envValue.resultSet = resultGenerate(d.data);
+							$rootScope.scopeObj.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
 
-					$scope.selectedEnv.result = {};
-					$scope.selectedEnv.result.resultSet = {};
+							// output
+							$scope.envValue.field.output.setValue(JSON.stringify(d.data));
+							$scope.envValue.field.output._value = $scope.envValue.field.output.getValue();
 
-					// history
-					for (var p in $scope.propertyString) {
-						try {
-							$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
-						} catch(e) { }
+							// debugoutput
+							if (d.data.debugOutput) $scope.envValue.field.debug.setValue(String(d.data.debugOutput).trim());
+							$scope.envValue.field.debug._value = $scope.envValue.field.debug.getValue();
+
+							if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 15000);
+							$scope.$apply();
+
+							$scope.selectedEnv.result = {};
+							$scope.selectedEnv.result.resultSet = {};
+
+							if (!$scope.resultSet) 
+								$scope.resultSet = {};	
+							
+							$scope.selectedEnv.result.resultSet = JSON.parse(JSON.stringify($scope.envValue.resultSet));
+							$scope.selectedEnv.result.input = $scope.envValue.field.input.getValue().split('\n');
+							$scope.selectedEnv.result.output = JSON.parse($scope.envValue.field.output.getValue());
+							$scope.selectedEnv.result.env = [$scope.selectedEnv.parent.name, $scope.selectedEnv.name];
+							$scope.selectedEnv.result.timestamp = Date.now();
+							$scope.selectedEnv.result.properties = {};
+
+							// history
+							for (var p in $scope.envValue.properties) {
+								try {
+									$scope.selectedEnv.result.properties[p] = {
+										value: $scope.envValue.properties[p].getValue(),
+										important: $scope.envValue.properties[p].important
+									}
+								} catch(e) { }
+							}
+
+							var hist = HistoryLib.read();
+							if (!hist) hist = [{}];
+							console.warn(JSON.parse(JSON.stringify($scope.selectedEnv)));
+
+							hist.unshift($scope.selectedEnv);
+							HistoryLib.write(hist);
+							$rootScope.historyContent = HistoryLib.read();
+							break;
+						case 'log':
+							$rootScope.addLoadStr(d.data);
+							$scope.notice.info(d.data, 8000);
+							$scope.$apply();
+							break;
+						case 'end':
+							$rootScope.magaret_phase = 0;
+							$scope.$apply();
+							break;
 					}
-
-					for (let p in $scope.propertyInput) {
-						try {
-							$scope.selectedEnv.result.properties[p] = JSON.parse(JSON.stringify($scope.propertyInput[p]));
-						} catch (e) { }
-					}
-					if (!$scope.resultSet) 
-						$scope.resultSet = {};	
-					
-					$scope.selectedEnv.result.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
-					$scope.selectedEnv.result.input = $scope.inputText.this.getValue().split('\n');
-					$scope.selectedEnv.result.output = JSON.parse($scope.outputText.this.getValue());
-					$scope.selectedEnv.result.env = [$scope.selectedEnv.parent.name, $scope.selectedEnv.name];
-					$scope.selectedEnv.result.properties = JSON.parse(JSON.stringify($scope.propertyInput));
-					$scope.selectedEnv.result.timestamp = Date.now();
-
-					var hist = HistoryLib.read();
-					if (!hist) hist = [{}];
-
-					hist.unshift($scope.selectedEnv);
-					HistoryLib.write(hist);
-					$rootScope.historyContent = HistoryLib.read();
-					break;
-				case 'log':
-					$scope.notice.info(d.data, 8000);
-					break;
-				case 'end':
-					break;
+				});
 			}
-		});
+		])
 	}
 
 
@@ -640,16 +825,17 @@ app.directive('codeMirror', ['$timeout', function ($timeout) {
 				matchBrackets: true,
 				smartIndent: false,
 				theme: scope.theme || 'default',
-				value: scope.content || '',
 				lineWrapping: scope.lineWrapping === 'true' ? true : false,
 				readOnly: scope.readOnly === 'true' ? true : false,
 				tabMode: 'default',
 			};
+
 			scope.syntax = 'javascript';
 			var myCodeMirror = CodeMirror.fromTextArea(textarea, codeMirrorConfig);
-			myCodeMirror.getDoc().setValue(scope.content || '');
+			scope.container.codemirror = true;
+			myCodeMirror.setValue(scope.container.getValue());
 
-			scope.container.this = myCodeMirror;
+			//scope.container.this = myCodeMirror;
 			myCodeMirror.getGutterElement().style['width'] = '59px'; /* 2.071428571 * 23 + 'px';*/
 			myCodeMirror.getGutterElement().style['marginLeft'] = '-5px';
 
@@ -662,14 +848,25 @@ app.directive('codeMirror', ['$timeout', function ($timeout) {
 			scope.$watch('lineWrapping', function (oldValue, newValue) {
 				myCodeMirror.setOption('lineWrapping', scope.lineWrapping);
 			})
+/*
+			scope.$watch('container.save', function(newValue, oldValue){
+					console.log('save changed');
+			}, true);
+*/
 
+			for (let i of ['getValue', 'setValue']) {
+				scope.container[i] = function (val) {
+					return myCodeMirror[i](val);
+				}
+			}
+/*
 			// Set the codemirror value to the scope
 			myCodeMirror.on('change', function (e) {
 				$timeout(function () {
 					scope.container.content = myCodeMirror.getValue();
 				}, 300);
 			});
-
+*/
 		}
 	};
 }
@@ -731,6 +928,15 @@ app.directive("panel", function (HistoryLib) {
 
 					$scope.loadEnv = env => {
 						$rootScope.scopeObj.loadEnv(env, true);
+					}
+
+					$scope.clearHistory = () => {
+						$rootScope.historyContent = '';
+						HistoryLib.write('');
+					}
+
+					$scope.loadHistory = history => {
+						$rootScope.scopeObj.loadHistory(history);
 					}
 
 					$scope.test = function(arg) {

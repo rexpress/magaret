@@ -15,9 +15,28 @@
       const dockerode = require('dockerode');
       var dd = new dockerode();
       var buff = '';
+      var cont = {};
+      var end = false;
       dd.run(image, [property, testset], process.stdout, {
         Tty: false
-      }, function (err, data, container) {}).on('stream', function (stream) {
+      }, function (err, data, container) {
+        var containerRemover = () => {
+          if (!end)
+            setTimeout(containerRemover, 500);
+          else
+            container.remove(function (err, data) {
+              if (!err)
+                console.log(`container removed`);
+              else
+                console.log('container remove error');
+            });
+        }
+        containerRemover();
+        setTimeout(() => {
+
+        })
+        this.cont = container;
+      }).on('stream', function (stream) {
         stream.on('data', function (chunk) {
           var chunk_str = chunk.toString();
           buff += chunk_str;
@@ -31,6 +50,12 @@
           return callback({ type: 'log', data: `${data}` });
         });
         stream.on('end', function () {
+          console.log(this.cont);
+          /*this.cont.remove(function (err, data) {
+            console.warn(err);
+            console.log(data);
+          });*/
+          end = true;
           return callback({ type: 'end' });
         });
       });
@@ -45,11 +70,31 @@
       let a = data.substr(data.search(docker.st)+docker.st.length);
       a = a.substr(0, a.search(docker.ed)).trim();
       try {
-        data = JSON.parse(a)
+        data = JSON.parse(a);
       }
-      catch(e) { 
-        console.warn(`dataExtract: ${e.message}`);
-        return;
+      catch(e) {
+        // stream bug fix (hardcoded)
+        if (a[0] != '{') a = a.substr(a.search('{'));
+        a = a.replace(/\x00/gi, '');
+        a = a.replace(/\x01/gi, '');
+        a = a.replace(/\x01/gi, '');
+        a = a.replace(/\x02/gi, '');
+        a = a.replace(/\x03/gi, '');
+        a = a.replace(/\x04/gi, '');
+        a = a.replace(/\x05/gi, '');
+        a = a.replace(/\x06/gi, '');
+        a = a.replace(/\x07/gi, '');
+        a = a.replace(/\x08/gi, '');
+        a = a.replace(/\x09/gi, '');
+        a = a.replace(/\x0F/gi, '');
+        a = a.replace(/\x15/gi, '');
+        try {
+          data = JSON.parse(a);
+        }
+        catch(e) {
+          console.warn(`dataExtract: ${e.message}`);
+          return;
+        }
       }
       return { type: 'result', data: data };
     },
@@ -59,12 +104,27 @@
       var docker = new dockerode();
 
       docker.pull(`${image}`, function (err, stream) {
+        if (err) {
+          console.error('docker.pull error');
+          callback({ type: 'error', data: err });
+        }
         stream.on('data', function (chunk) {
           var chunk_str = chunk.toString();
           for (let item of chunk_str.split('\n')) {
           console.log(`${item.trim().length} <${item}>`);
-            if (item.trim().length)
-              callback({ type: 'log', data: JSON.parse(item).status });
+          if (item.trim().length) {
+            var item_data = JSON.parse(item);
+            var data;
+            if (item_data.progress)
+              data = item_data.progress;
+            else 
+              data = item_data.status;
+
+            if (item_data.id)
+              data += ' ' + item_data.id;
+            
+            callback({ type: 'log', data: data });
+          }
           }
         });
         stream.on('end', function () {
