@@ -16,10 +16,25 @@
       var dd = new dockerode();
       var buff = '';
       var cont = {};
+      var end = false;
       dd.run(image, [property, testset], process.stdout, {
         Tty: false
       }, function (err, data, container) {
-        console.log(container);
+        var containerRemover = () => {
+          if (!end)
+            setTimeout(containerRemover, 500);
+          else
+            container.remove(function (err, data) {
+              if (!err)
+                console.log(`container removed`);
+              else
+                console.log('container remove error');
+            });
+        }
+        containerRemover();
+        setTimeout(() => {
+
+        })
         this.cont = container;
       }).on('stream', function (stream) {
         stream.on('data', function (chunk) {
@@ -40,6 +55,7 @@
             console.warn(err);
             console.log(data);
           });*/
+          end = true;
           return callback({ type: 'end' });
         });
       });
@@ -88,12 +104,27 @@
       var docker = new dockerode();
 
       docker.pull(`${image}`, function (err, stream) {
+        if (err) {
+          console.error('docker.pull error');
+          callback({ type: 'error', data: err });
+        }
         stream.on('data', function (chunk) {
           var chunk_str = chunk.toString();
           for (let item of chunk_str.split('\n')) {
           console.log(`${item.trim().length} <${item}>`);
-            if (item.trim().length)
-              callback({ type: 'log', data: JSON.parse(item).status });
+          if (item.trim().length) {
+            var item_data = JSON.parse(item);
+            var data;
+            if (item_data.progress)
+              data = item_data.progress;
+            else 
+              data = item_data.status;
+
+            if (item_data.id)
+              data += ' ' + item_data.id;
+            
+            callback({ type: 'log', data: data });
+          }
           }
         });
         stream.on('end', function () {

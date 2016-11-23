@@ -1,5 +1,13 @@
 @charset "utf-8";
 
+#hist_content {
+  display: none;
+}
+
+#hist_content.show {
+  display: block;
+}
+
 panel > section {
   position: absolute;
   z-index: 2;
@@ -35,6 +43,16 @@ panel > .hist_title.show {
   top: 60px;
   right: 0;
   z-index: 10;
+}
+
+.hist_clear {
+  margin-left: 3px;
+  font-size: 0.85rem;
+  color: white;
+}
+
+.hist_clear:hover {
+  text-decoration: underline;
 }
 
 .history {

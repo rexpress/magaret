@@ -1,16 +1,23 @@
 <!-- pseudo design -->
-<span class="hist_title" ng-class='{ show: visible, left: alignment === "left", right: alignment === "right" }'>HISTORY</span>
+<span class="hist_title" ng-class='{ show: visible, left: alignment === "left", right: alignment === "right" }'>
+  HISTORY
+  <a href="javascript:void(0)" ng-click="clearHistory()">
+    <span class="hist_clear">
+      (clear)
+    </span>
+  </a>
+</span>
 <section id="hist_content" class="history" ng-class='{ show: visible, left: alignment === "left", right: alignment === "right" }'>
   <div class="history-box" ng-repeat="item in historyContent() track by $index">
     <span class="env_title">{{ item.displayName }}
       <span class="env_image">({{ item.info.docker_image}})
     </span>
     <div class="env_sep"></div>
-    <content ng-click="loadEnv(item)">
+    <content ng-click="loadHistory(item)">
       <ul class="properties">
-        <li ng-repeat="(key, val) in item.result.properties">
+        <li ng-repeat="(key, val) in item.result.properties" ng-show="val.important">
           <span class="key">{{ key }}</span>
-          <span class="value">{{ val }}</span>
+          <span class="value">{{ val.value }}</span>
         </li>
         <li class="env_sep"></li>
         <li>
