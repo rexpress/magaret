@@ -177,9 +177,16 @@ app.on('ready', () => {
 	let win = new BrowserWindow({width: 1000, height: 700})
 	win.on('closed', () => {
 		win = null;
+    app.quit();
 	});
 
 	//win.webContents.openDevTools();
 	// Or load a local HTML file
 	win.loadURL(`file://${__dirname}/index.html`)
+});
+
+// Quit when all windows are closed.
+app.on('window-all-closed', function() {
+  if (process.platform != 'darwin')
+    app.quit();
 });
