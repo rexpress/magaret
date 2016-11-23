@@ -16,13 +16,13 @@
 			<button ng-show="!selectedEnv._image && selectedEnv.image[0] == 1" ng-click="updateForm()">Install</button>
 			<button ng-show="!selectedEnv._image && selectedEnv.image[0] == 2" ng-click="updateForm()">Update</button>
 			<button ng-click="resetForm()">Reset</button>
-			<button class="share" ng-show="!!envValue.field.output.getValue() && !!resultSet.type" ng-click="showShareBox($event)">Share</button>
+			<button class="share" ng-show="!!envValue.field.output.getValue() && !!envValue.resultSet.type" ng-click="showShareBox($event)">Share</button>
 		</section>
 	</div>
 	<section id="property">
 		<title>properties</title>
 			<div id="adv_mode">
-				<input type="checkbox" ng-model="advMode">Advanced Mode</input>
+				<input type="checkbox" ng-model="advMode" ng-click="saveAdvMode($event)">Advanced Mode</input>
 			</div>
 		<content>
 			<!--<table>
@@ -37,7 +37,7 @@
 				<input type="hidden" value="extractor" data-name="test_type">
 				<tr ng-repeat="property in selectedEnv.info.properties" ng-show="(advMode || property.important) && property.type != 'hidden'">
 					<th>
-						<span ng:class="property.required && 'required'" title="{{ property.name }}">{{ property.name }}</span>
+						<span ng:class="property.important && 'important'" title="{{ property.name }}">{{ property.name }}</span>
 						<a class="help" data-tooltip-text="{{ property.help }}">?</a>
 					</th>
 					<td>
@@ -48,10 +48,9 @@
 							<!--<textarea ng-switch-when="string" ng-model="propertyInput[property.name]"></textarea>-->
 							<input ng-switch-when="number" type="number" ng-model="envValue.properties[property.name]._value">
 							<input ng-switch-when="boolean" type="checkbox" ng-model="envValue.properties[property.name]._value"></textarea>
-							<select ng-switch-when="list" ng-model="envValue.properties[property.name]" ng-options="key as value for (key, value) in property.list">
+							<select ng-switch-when="list" ng-model="envValue.properties[property.name]._value" ng-options="key as value for (key, value) in property.list">
 							</select>
 						</div>
-						{{ property.default }}
 						<!--{{ envValue.properties[property.name] }}-->
 						<pre ng-show="(property.type == 'string' || property.type == 'number') && property.example" class="example">example: {{ property.example }}</pre>
 					</td>
@@ -62,26 +61,26 @@
 	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="input">
 		<title>input</title>
 		<content>
-			<code-mirror ng-model="envValue.field.input" container="envValue.field.input" theme='tomorrow-night-eighties' line-numbers="true"></code-mirror>
+			<code-mirror ng-model="fieldInfo['input']" container="fieldInfo['input']" theme='tomorrow-night-eighties' line-numbers="true"></code-mirror>
 		</content>
 	</section>
-	<section id="result" ng-show="!!resultSet.type">
+	<section id="result" ng-show="!!envValue.resultSet.type">
 		<title>result</title>
 		<content class="overflow-x-auto">
-			<table class="result-table" ng-show="resultSet.type == 'group'">
+			<table class="result-table" ng-show="envValue.resultSet.type == 'group'">
 				<thead>
 					<tr>
 						<th>&nbsp;</th>
-						<th ng-repeat="column in resultSet.columns track by $index">{{ column }}</th>
+						<th ng-repeat="column in envValue.resultSet.columns track by $index">{{ column }}</th>
 						<th class="space"></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="result in resultSet.list track by $index">
+					<tr ng-repeat="result in envValue.resultSet.list track by $index">
 						<td class="line-number">
 							<div>{{ result[0] }}</div>
 						</td>
-						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null">
+						<td class="group-data-null" colspan="{{ envValue.resultSet.columns.length }}" ng-show="result[1] == null">
 							<div>Unmatched</div>
 						</td>
 						<td ng-repeat="item in result[1] track by $index" class="group-data" ng-show="result[1] != null">
@@ -93,29 +92,29 @@
 					</tr>
 				</tbody>
 			</table>
-			<table class="result-table" ng-show="resultSet.type == 'string' || resultSet.type == 'match'">
+			<table class="result-table" ng-show="envValue.resultSet.type == 'string' || envValue.resultSet.type == 'match'">
 				<thead>
 					<tr>
 						<th>&nbsp;</th>
-						<th ng-repeat="column in resultSet.columns track by $index">{{ column }}</th>
+						<th ng-repeat="column in envValue.resultSet.columns track by $index">{{ column }}</th>
 						<th class="space"></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="result in resultSet.list track by $index">
+					<tr ng-repeat="result in envValue.resultSet.list track by $index">
 						<td class="line-number">
 							<div>{{ $index + 1 }}</div>
 						</td>
-						<td class="group-data-null" colspan="{{ resultSet.columns.length }}" ng-show="result[1] == null">
+						<td class="group-data-null" colspan="{{ envValue.resultSet.columns.length }}" ng-show="result[1] == null">
 							<div>Null</div>
 						</td>
-						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
+						<td class="group-data" ng:class="envValue.resultSet.type == 'match' && result[1] == false && 'bool-false' || envValue.resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
 							<div>{{ result[0] }}</div>
 						</td>
-						<td class="group-data" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
+						<td class="group-data" ng:class="envValue.resultSet.type == 'match' && result[1] == false && 'bool-false' || envValue.resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
 							<div>{{ result[1] }}</div>
 						</td>
-						<td class="space" ng:class="resultSet.type == 'match' && result[1] == false && 'bool-false' || resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
+						<td class="space" ng:class="envValue.resultSet.type == 'match' && result[1] == false && 'bool-false' || envValue.resultSet.type == 'match' && result[1] == true && 'bool-true' || ''">
 							<div>&nbsp;</div>
 						</td>
 					</tr>
@@ -123,17 +122,18 @@
 			</table>
 		</content>
 	</section>
-	{{ envValue.field.debug }}
-	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="output" ng-show="!!resultSet.type">
+	<!--
+	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="output" ng-show="!!envValue.field.output._value">
 		<title>output</title>
 		<content>
-			<code-mirror container="envValue.field['output']" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
+			<code-mirror container="fieldInfo['output']" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
 		</content>
 	</section>
-	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="debug" ng-show="!!resultSet.type">
+	-->
+	<section ng-repeat="env in selectedEnv" ng-if="$index==1" id="debug" ng-show="!!envValue.field.debug._value">
 		<title>debug</title>
 		<content>
-			<code-mirror container="envValue.field['debug']" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
+			<code-mirror container="fieldInfo['debug']" theme='tomorrow-night-eighties' line-wrapping="false" read-only="true" line-numbers="true"></code-mirror>
 		</content>
 	</section>
 	<div id="foot-area"></div>

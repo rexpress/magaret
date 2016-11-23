@@ -255,9 +255,15 @@ testing-page #properties th span:before {
 	display: inline-block;
 }
 
-testing-page #properties th span.required:before {
+testing-page #properties th span.important:before {
 	content: '*';
 	color: red;
+	margin-right: 0.5rem;
+}
+
+testing-page #properties th span.required:before {
+	content: '*';
+	color: blue;
 	margin-right: 0.5rem;
 }
 
@@ -415,8 +421,8 @@ table.result-table {
 }
 
 .result-table .bool-true {
-	background: #11b9b9 !important;
-  color: white !important;
+	background: #e3e8e8 !important;
+  color: #004848 !important;
 }
 
 .overflow-x-auto {

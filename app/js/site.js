@@ -105,7 +105,7 @@ app.run(function ($rootScope, GitHubToken, HistoryLib) {
 	}
 });
 
-app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib, GitHubToken) {
+app.controller("TesterController", function ($scope, $rootScope, Environments, CacheLib, GitHubToken, ConfigLib) {
 	var envInfo = CacheLib.read('envInfo');
 
 	$rootScope.scopeObj = $scope;
@@ -170,8 +170,12 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 		});
 	}
 
+	var config = ConfigLib.load();
+	if (!config)
+		$scope.advMode = true;
+	else
+		$scope.advMode = config.advMode;
 	$scope.selectedEnv = null;
-	$scope.advMode = true;
 	
 	// initialize resultSet object
 	$scope.resultSet = {};
@@ -181,10 +185,11 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 		console.warn($scope.envCollection);
 
 		if ($scope.envValue) {
-		$scope.envValue.field.input.save[oldEnv.name] = $scope.envValue.field.input.getValue();
-		$scope.envValue.field.output.save[oldEnv.name] = $scope.envValue.field.output.getValue();
-		$scope.envValue.field.debug.save[oldEnv.name] = $scope.envValue.field.debug.getValue();
-		console.warn($scope.envValue);
+			console.log($scope.envValue.field.input.getValue());
+			$scope.envValue.field.input.save = $scope.envValue.field.input.getValue();
+			$scope.envValue.field.output.save = $scope.envValue.field.output.getValue();
+			$scope.envValue.field.debug.save = $scope.envValue.field.debug.getValue();
+			console.warn($scope.envValue);
 		}
 		/*
 		if (isHistory && $scope.selectedEnv)
@@ -278,23 +283,38 @@ console.log($rootScope.scopeObj.propertyInput);
 						},
 						setValue: function (val) {
 							this._value = val;
-						},
-						save: {}
+						}
 					}
 				}
 		}
 
+		// create envCollection
 		if (!$scope.envCollection[env.name]) {
 			console.info(`Create envCollection: ${env.name}`);
 			$scope.envValue = {
 				properties: {},
-				field: $scope.fieldInfo,
+				field: {},
+				resultSet: {}
 			};
+
+			// reference to fieldInfo
+			for (let i of ['input', 'output', 'debug']) {
+				$scope.envValue.field[i] = {
+					getValue: function () {
+						return $scope.fieldInfo[i].getValue();
+					},
+					setValue: function (val) {
+						return $scope.fieldInfo[i].setValue(val);
+					},
+					save: {}
+				}
+			}
 
 			console.info($scope.envValue);
 
 			for (let item of ['input', 'output', 'debug']) {
-				$scope.envValue.field[item].save[env.name] = '';
+				$scope.envValue.field[item].save = '';
+				$scope.envValue.field[item].setValue('');
 			};
 
 			for (let item of env.info.properties) {
@@ -310,8 +330,8 @@ console.log($rootScope.scopeObj.propertyInput);
 							type: item.type,
 							example: item.example || '',
 							required: item.required,
-							default: item.value || item.example,
-							_value: item.value || item.example || '',
+							default: item.default || item.value || item.example,
+							_value: item.default || item.value ||item.example || '',
 							getValue: function() {
 								return this._value;
 							},
@@ -359,6 +379,11 @@ console.log($rootScope.scopeObj.propertyInput);
 					content: ''
 				};
 		}
+
+		// assignment to save value
+		for (let i of ['input', 'output', 'debug']) {
+				$scope.envValue.field[i].setValue($scope.envValue.field[i].save);
+		}
 	};
 
 	$scope.loadEnv = loadEnv;
@@ -388,7 +413,7 @@ app.controller("HistoryController", function ($scope, $rootScope) {
 
 
 
-app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib) {
+app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib, ConfigLib) {
 	// On selected Env is changed
 	$rootScope.initPropertyData = initPropertyData;
 	$scope.one = 1;
@@ -543,6 +568,10 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 		])
 	}
 
+	$scope.saveAdvMode = function (e) {
+		ConfigLib.save({'advMode': $scope.advMode});
+	}
+
 	$scope.testForm = function () {
 		for (var p in $scope.propertyString) {
 			try {
@@ -568,7 +597,7 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 		let initField = (() => {
 			$scope.envValue.field.output.setValue('');
 			$scope.envValue.field.debug.setValue('');
-			$scope.resultSet = null;
+			$scope.envValue.resultSet = null;
 		})();
 
 		let resultGenerate = (data => {
@@ -604,7 +633,7 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 							}
 						}
 
-						if (!resultSet.columns.length) {
+						if (!resultSet.columns || !resultSet.columns.length) {
 							resultSet.columns = [];
 							for (let i = 0; i < k; i++)
 								resultSet.columns.push(String.fromCharCode(l++));
@@ -646,10 +675,18 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 		mg_docker.exec(env.image, env.property, env.testset, d => {
 			switch (d.type) {
 				case 'result':
-					$scope.resultSet = resultGenerate(d.data);
+					// generate and print resultset
+					$scope.envValue.resultSet = resultGenerate(d.data);
 					$rootScope.scopeObj.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
+
+					// output
 					$scope.envValue.field.output.setValue(JSON.stringify(d.data));
+					$scope.envValue.field.output._value = $scope.envValue.field.output.getValue();
+
+					// debugoutput
 					if (d.data.debugOutput) $scope.envValue.field.debug.setValue(String(d.data.debugOutput).trim());
+					$scope.envValue.field.debug._value = $scope.envValue.field.debug.getValue();
+
 					if ($scope.resultSet.exception) $scope.notice.err($scope.resultSet.exception, 15000);
 					$scope.$apply();
 
