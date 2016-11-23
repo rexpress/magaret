@@ -366,17 +366,6 @@ app.controller("TesterController", function ($scope, $rootScope, Environments, C
 				return false;
 			}
 		}
-		console.log($scope.envValue);
-		//console.warn($scope.envValue);
-		// assignment to property value
-		$scope.propertyInput = {};
-		$scope.propertyString = {};
-		for (let item of env.info.properties) {
-			if (item.type == 'string')
-				$scope.propertyString[item.name] = {
-					content: ''
-				};
-		}
 
 		// assignment to save value
 		for (let i of ['input', 'output', 'debug']) {
@@ -484,28 +473,9 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 			$scope.debugText.this.setValue($scope.selectedEnv.save.debugText);
 		else if ($scope.debugText.this)
 				$scope.debugText.this.setValue('');
-/*
-		if (!isHistory) {
-			if ($scope.selectedEnv.save.resultSet)
-				$scope.resultSet = $scope.selectedEnv.save.resultSet;
-			else
-				$scope.resultSet = null;
-		} else {
-			$scope.resultSet = $scope.selectedEnv.save.resultSet;
-		}
-*/
-		$scope.testSetInput = "";
-		$scope.jsonResultSet = null;
-		$scope.testResultSet = null;
-		$scope.debugOutput = null;
+
 		$scope._notice = null;
 		$scope.result = null;
-
-		// for (let p in $scope.propertyString) {
-		// 	try {
-		// 			$scope.propertyString[p].this.setValue('');
-		// 	} catch (e) {console.error(e) }
-		// }
 	}
 
 	$scope.codemirrorLoaded = function (_editor) {
@@ -513,12 +483,6 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 		_editor.on("beforeChange", function () { _editor.refresh() });
 		_editor.on("change", function () { _editor.refresh() });
 	};
-
-	$scope.codemirrorInit = function () {
-		for (let a in $scope.propertyString) {
-			$scope.propertyString[a].content = $scope.propertyInput[a];
-		}
-	}
 
 	$scope.shareForm = function () {
 		$scope.shareBox = true;
@@ -628,15 +592,7 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 			},
 			function (callback) {
 				$rootScope.addLoadStr('Request Docker.');
-				for (var p in $scope.propertyString) {
-					try {
-						$scope.propertyInput[p] = $scope.propertyString[p].this.getValue();
-						//console.log(`${p}: ${$scope.propertyInput[p]}`)
-					} catch (e) { }
-				}
 
-				console.log(env.testset);
-				console.log($scope.envValue.properties);
 				for (let p in $scope.envValue.properties) {
 					env.property[p] = $scope.envValue.properties[p].getValue();	
 				}
@@ -726,6 +682,8 @@ app.controller("TestingPageController", function ($rootScope, $scope, HistoryLib
 							$scope.envValue.resultSet = resultGenerate(d.data);
 							$rootScope.scopeObj.resultSet = JSON.parse(JSON.stringify($scope.resultSet));
 
+							console.info($scope.envValue.resultSet);
+							
 							// output
 							$scope.envValue.field.output.setValue(JSON.stringify(d.data));
 							$scope.envValue.field.output._value = $scope.envValue.field.output.getValue();
@@ -980,6 +938,7 @@ app.directive("sharebox", function ($rootScope, $timeout) {
 				require('electron').clipboard.writeText($scope.shareURL);
 			}
 			$scope.submitForm = function (e) {
+				
 				if (!$rootScope.ghToken) {
 					$scope.shareStep = 1;
 					$scope.shareMsg = 'Require login token.';
@@ -992,7 +951,7 @@ app.directive("sharebox", function ($rootScope, $timeout) {
 				}
 				$scope.shareStep = 2;
 				var result = $rootScope.scopeObj.selectedEnv.result;
-
+				
 				let env = (() => {
 					return {
 						property: $rootScope.scopeObj.propertyInput,
@@ -1023,6 +982,11 @@ app.directive("sharebox", function ($rootScope, $timeout) {
 				obj.data.title = $scope.title;
 				obj.data.description = $scope.description;
 				obj.data.tags = $scope.tags;
+
+				// properties loop (~.value -> ~)
+				for (let d in obj.data.properties) {
+					obj.data.properties[d] = obj.data.properties[d].value;
+				}
 
 				const httpContext = {
 					'headers': {
