@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "async": "^2.1.2",
-    "electron": "^1.4.2",
+    "electron": "^9.1.0",
     "jsonfile": "^2.4.0",
     "request": "^2.75.0",
     "dockerode": "^2.3.1"
